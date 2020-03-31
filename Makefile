@@ -5,8 +5,9 @@ ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 PACKAGE := $(notdir $(PWD))
 SOURCES = $(wildcard src/com/jcomeau/$(PACKAGE)/*.java)
+APK := $(PWD)/bin/$(PACKAGE).apk
 export
-build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package
+build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package sign $(APK)
 clean:
 	rm -rf src/com/jcomeau/$(PACKAGE)/R.java
 src/com/jcomeau/$(PACKAGE)/R.java:
@@ -44,3 +45,18 @@ version:
 	java -version
 list:
 	$(TOOLS)/aapt list $(PWD)/bin/$(PACKAGE).unaligned.apk
+keys:
+	@echo Enter password as: $(PACKAGE)
+	keytool \
+	 -genkeypair \
+	 -validity 365 \
+	 -keystore $(HOME)/$(PACKAGE)key.keystore \
+	 -keyalg RSA \
+	 -keysize 2048
+sign:
+	@echo Enter password as: $(PACKAGE)
+	apksigner sign \
+	 --ks $(HOME)/$(PACKAGE)key.keystore \
+	 $(PWD)/bin/$(PACKAGE).unaligned.apk
+%.apk: %.unaligned.apk
+	zipalign -f 4 $< $@

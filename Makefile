@@ -3,18 +3,18 @@ MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
-SOURCES = $(wildcard src/com/jcomeau/studytimer/*.java)
+PACKAGE := $(notdir $(PWD))
+SOURCES = $(wildcard src/com/jcomeau/$(PACKAGE)/*.java)
 export
-build: src/com/jcomeau/studytimer/R.java classes dex
+build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package
 clean:
-	rm -rf src/com/jcomeau/studytimer/R.java
-src/com/jcomeau/studytimer/R.java:
-	cd $(SDK) && \
-	 ./build-tools/$(MINVER)*/aapt package -f -m \
-	  -J $(PWD)/src \
-	  -M $(PWD)/AndroidManifest.xml \
-	  -S $(PWD)/res \
-	  -I $(ANDROID)
+	rm -rf src/com/jcomeau/$(PACKAGE)/R.java
+src/com/jcomeau/$(PACKAGE)/R.java:
+	$(TOOLS)/aapt package -f -m \
+	 -J $(PWD)/src \
+	 -M $(PWD)/AndroidManifest.xml \
+	 -S $(PWD)/res \
+	 -I $(ANDROID)
 classes: $(SOURCES)
 	javac -d obj \
 	 -source 1.6 \
@@ -27,9 +27,20 @@ dex:
 	 --dex \
 	 --output=$(PWD)/bin/classes.dex \
 	 $(PWD)/obj
+package:
+	$(TOOLS)/aapt package -f -m \
+	 -F $(PWD)/bin/$(PACKAGE).unaligned.apk \
+	 -M $(PWD)/AndroidManifest.xml \
+	 -S $(PWD)/res \
+	 -I $(ANDROID)
+	cp $(PWD)/bin/classes.dex .
+	$(TOOLS)/aapt add $(PWD)/bin/$(PACKAGE).unaligned.apk classes.dex
+	rm classes.dex
 edit: $(SOURCES)
 	vi $+
 env:
 	env
 version:
 	java -version
+list:
+	$(TOOLS)/aapt list $(PWD)/bin/$(PACKAGE).unaligned.apk

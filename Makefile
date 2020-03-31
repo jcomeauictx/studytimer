@@ -18,13 +18,12 @@ src/com/jcomeau/studytimer/R.java:
 classes: $(SOURCES)
 	javac -d obj \
 	 -source 1.6 \
-	 -target 1.8 \
+	 -target 1.7 \
 	 -classpath src \
 	 -bootclasspath $(ANDROID) \
 	 $+
 dex:
 	strace -f -o/tmp/dx.log $(TOOLS)/dx \
-	 -Jversion:1.8+ \
 	 --dex \
 	 --output=$(PWD)/bin/classes.dex \
 	 $(PWD)/obj

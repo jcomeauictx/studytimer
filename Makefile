@@ -65,3 +65,7 @@ sign: $(APK)
 	$(TOOLS)/zipalign -f 4 $< $@
 tools:
 	ls $(TOOLS)
+install:
+	adb install $(APK)
+test:
+	adb shell am start -n com.jcomeau.$(PACKAGE)/.MainActivity

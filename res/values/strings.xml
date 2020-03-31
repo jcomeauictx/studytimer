@@ -1,0 +1,6 @@
+<resources>
+   <string name="app_name">Study Timer</string>
+   <string name="hello_msg">Welcome to the study timer.</string>
+   <string name="menu_settings">Settings</string>
+   <string name="title_activity_main">MainActivity</string>
+</resources>

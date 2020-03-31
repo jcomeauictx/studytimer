@@ -7,7 +7,7 @@ PACKAGE := $(notdir $(PWD))
 SOURCES = $(wildcard src/com/jcomeau/$(PACKAGE)/*.java)
 APK := $(PWD)/bin/$(PACKAGE).apk
 export
-build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package sign $(APK)
+build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package sign
 clean:
 	rm -rf src/com/jcomeau/$(PACKAGE)/R.java
 src/com/jcomeau/$(PACKAGE)/R.java:
@@ -53,10 +53,15 @@ keys:
 	 -keystore $(HOME)/$(PACKAGE)key.keystore \
 	 -keyalg RSA \
 	 -keysize 2048
-sign:
+sign: $(APK)
 	@echo Enter password as: $(PACKAGE)
-	apksigner sign \
-	 --ks $(HOME)/$(PACKAGE)key.keystore \
-	 $(PWD)/bin/$(PACKAGE).unaligned.apk
+	jarsigner \
+	 -verbose \
+	 -sigalg SHA1withRSA \
+	 -digestalg SHA1 \
+	 -keystore $(HOME)/$(PACKAGE)key.keystore \
+	 $< mykey
 %.apk: %.unaligned.apk
-	zipalign -f 4 $< $@
+	$(TOOLS)/zipalign -f 4 $< $@
+tools:
+	ls $(TOOLS)

@@ -5,38 +5,39 @@ ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 PACKAGE := $(notdir $(PWD))
 SOURCES = $(wildcard src/com/jcomeau/$(PACKAGE)/*.java)
-APK := $(PWD)/bin/$(PACKAGE).apk
+CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
+APK := bin/$(PACKAGE).apk
 export
-build: src/com/jcomeau/$(PACKAGE)/R.java classes dex package sign
+build: src/com/jcomeau/$(PACKAGE)/R.java $(APK)
 clean:
 	rm -rf src/com/jcomeau/$(PACKAGE)/R.java
 src/com/jcomeau/$(PACKAGE)/R.java:
 	$(TOOLS)/aapt package -f -m \
-	 -J $(PWD)/src \
-	 -M $(PWD)/AndroidManifest.xml \
-	 -S $(PWD)/res \
+	 -J src \
+	 -M AndroidManifest.xml \
+	 -S res \
 	 -I $(ANDROID)
-classes: $(SOURCES)
+$(CLASSES): $(SOURCES)
 	javac -d obj \
 	 -source 1.6 \
 	 -target 1.7 \
 	 -classpath src \
 	 -bootclasspath $(ANDROID) \
 	 $+
-dex:
+bin/classes.dex: $(CLASSES)
 	strace -f -o/tmp/dx.log $(TOOLS)/dx \
 	 --dex \
-	 --output=$(PWD)/bin/classes.dex \
-	 $(PWD)/obj
-package:
+	 --output=$@ \
+	 obj
+bin/$(PACKAGE).unaligned.apk: bin/classes.dex
 	$(TOOLS)/aapt package -f -m \
-	 -F $(PWD)/bin/$(PACKAGE).unaligned.apk \
-	 -M $(PWD)/AndroidManifest.xml \
-	 -S $(PWD)/res \
+	 -F $@ \
+	 -M AndroidManifest.xml \
+	 -S res \
 	 -I $(ANDROID)
-	cp $(PWD)/bin/classes.dex .
-	$(TOOLS)/aapt add $(PWD)/bin/$(PACKAGE).unaligned.apk classes.dex
-	rm classes.dex
+	cp $< .
+	$(TOOLS)/aapt add bin/$(PACKAGE).unaligned.apk classes.dex
+	rm $(<F)
 edit: $(SOURCES)
 	vi $+
 env:
@@ -44,7 +45,7 @@ env:
 version:
 	java -version
 list:
-	$(TOOLS)/aapt list $(PWD)/bin/$(PACKAGE).unaligned.apk
+	$(TOOLS)/aapt list bin/$(PACKAGE).unaligned.apk
 keys:
 	@echo Enter password as: $(PACKAGE)
 	keytool \
@@ -53,15 +54,15 @@ keys:
 	 -keystore $(HOME)/$(PACKAGE)key.keystore \
 	 -keyalg RSA \
 	 -keysize 2048
-sign: $(APK)
+$(APK): $(APK:.apk=.unsigned.apk)
 	@echo Enter password as: $(PACKAGE)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
 	 -keystore $(HOME)/$(PACKAGE)key.keystore \
-	 $< mykey
-%.apk: %.unaligned.apk
+	 $@ mykey
+%.unsigned.apk: %.unaligned.apk
 	$(TOOLS)/zipalign -f 4 $< $@
 tools:
 	ls $(TOOLS)

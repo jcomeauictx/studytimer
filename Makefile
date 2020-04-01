@@ -1,17 +1,20 @@
 PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(PATH)
+APPNAME := $(notdir $(PWD))
+PACKAGE := com.jcomeau.$(APPNAME)
+APPPATH := src/$(subst .,/,$(PACKAGE))
 MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
-PACKAGE := $(notdir $(PWD))
-SOURCES = $(wildcard src/com/jcomeau/$(PACKAGE)/*.java)
+SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
-APK := bin/$(PACKAGE).apk
+APK := bin/$(APPNAME).apk
+DIRS := obj bin res/drawable libs
 export
-build: src/com/jcomeau/$(PACKAGE)/R.java $(APK)
+build: $(DIRS) $(APPPATH)/R.java $(APK)
 clean:
-	rm -rf src/com/jcomeau/$(PACKAGE)/R.java
-src/com/jcomeau/$(PACKAGE)/R.java:
+	rm -rf $(APPPATH)/R.java $(DIRS)
+$(APPPATH)/R.java:
 	$(TOOLS)/aapt package -f -m \
 	 -J src \
 	 -M AndroidManifest.xml \
@@ -29,14 +32,14 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
-bin/$(PACKAGE).unaligned.apk: bin/classes.dex
+bin/$(APPNAME).unaligned.apk: bin/classes.dex
 	$(TOOLS)/aapt package -f -m \
 	 -F $@ \
 	 -M AndroidManifest.xml \
 	 -S res \
 	 -I $(ANDROID)
 	cp $< .
-	$(TOOLS)/aapt add bin/$(PACKAGE).unaligned.apk classes.dex
+	$(TOOLS)/aapt add bin/$(APPNAME).unaligned.apk classes.dex
 	rm $(<F)
 edit: $(SOURCES)
 	vi $+
@@ -45,23 +48,24 @@ env:
 version:
 	java -version
 list:
-	$(TOOLS)/aapt list bin/$(PACKAGE).unaligned.apk
+	$(TOOLS)/aapt list bin/$(APPNAME).unaligned.apk
 keys:
-	@echo Enter password as: $(PACKAGE)
+	@echo Enter password as: $(APPNAME)
 	keytool \
 	 -genkeypair \
 	 -validity 365 \
-	 -keystore $(HOME)/$(PACKAGE)key.keystore \
+	 -keystore $(HOME)/$(APPNAME)key.keystore \
 	 -keyalg RSA \
 	 -keysize 2048
 $(APK): $(APK:.apk=.unsigned.apk)
-	@echo Enter password as: $(PACKAGE)
+	@echo Enter password as: $(APPNAME)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
-	 -keystore $(HOME)/$(PACKAGE)key.keystore \
-	 $@ mykey
+	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 $< mykey
+	mv $< $@
 %.unsigned.apk: %.unaligned.apk
 	$(TOOLS)/zipalign -f 4 $< $@
 tools:
@@ -69,4 +73,6 @@ tools:
 install:
 	adb install $(APK)
 test:
-	adb shell am start -n com.jcomeau.$(PACKAGE)/.MainActivity
+	adb shell am start -n $(PACKAGE)/.MainActivity
+$(APPPATH) $(DIRS):
+	mkdir -p $@

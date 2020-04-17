@@ -72,6 +72,9 @@ tools:
 	ls $(TOOLS)
 install:
 	adb install $(APK)
+uninstall:
+	adb uninstall $(PACKAGE)
+reinstall: uninstall install
 test:
 	adb shell am start -n $(PACKAGE)/.MainActivity
 $(APPPATH) $(DIRS):

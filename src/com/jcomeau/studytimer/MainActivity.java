@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.view.View;
 import android.content.Context;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
         alarmManager =
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
-    protected void nag() {
+    protected void nag(View view) {
 	alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
             SystemClock.elapsedRealtime() + NAG_INTERVAL, NAG_INTERVAL,
 	    alarmIntent);

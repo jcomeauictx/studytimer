@@ -6,15 +6,17 @@ MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
+R := $(APPPATH)/R.java
 SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
+XML := $(wildcard res/*/*.xml)
+EDITABLE := $(XML) $(filter-out $(R), $(SOURCES))
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
-XML := $(wildcard res/*/*.xml)
 export
-build: $(DIRS) $(APPPATH)/R.java $(APK)
+build: $(DIRS) $(R) $(APK)
 clean:
-	rm -rf $(APPPATH)/R.java $(DIRS)
+	rm -rf $(R) $(DIRS)
 $(APPPATH)/R.java: $(XML)
 	$(TOOLS)/aapt package -f -m \
 	 -J src \
@@ -42,7 +44,7 @@ bin/$(APPNAME).unaligned.apk: bin/classes.dex
 	cp $< .
 	$(TOOLS)/aapt add bin/$(APPNAME).unaligned.apk classes.dex
 	rm $(<F)
-edit: $(SOURCES)
+edit: $(EDITABLE)
 	vi $+
 env:
 	env

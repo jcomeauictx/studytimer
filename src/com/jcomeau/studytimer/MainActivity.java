@@ -10,6 +10,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -19,6 +20,7 @@ public class MainActivity extends Activity {
     PendingIntent alarmIntent;
     Context context;
     Intent intent;
+    Button start;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

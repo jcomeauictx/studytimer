@@ -10,11 +10,12 @@ SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
+XML := $(wildcard res/*/*.xml)
 export
 build: $(DIRS) $(APPPATH)/R.java $(APK)
 clean:
 	rm -rf $(APPPATH)/R.java $(DIRS)
-$(APPPATH)/R.java:
+$(APPPATH)/R.java: $(XML)
 	$(TOOLS)/aapt package -f -m \
 	 -J src \
 	 -M AndroidManifest.xml \

@@ -10,7 +10,7 @@ R := $(APPPATH)/R.java
 SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
 XML := $(wildcard res/*/*.xml)
-EDITABLE := $(XML) $(filter-out $(R), $(SOURCES))
+EDITABLE := $(filter-out $(R), $(SOURCES)) $(XML)
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
 export

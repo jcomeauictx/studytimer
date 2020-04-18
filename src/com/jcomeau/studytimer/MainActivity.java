@@ -17,7 +17,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     String TAG = "studytimer";
     // Comment out one of the following. Time in milliseconds
-    int NAG_INTERVAL = 10 * 1000;  // debugging
+    int NAG_INTERVAL = 5 * 1000;  // 5 seconds when debugging
     //int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
     int REQUEST_ID = 1;
     AlarmManager alarmManager;
@@ -32,8 +32,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         context = this.getApplicationContext();
         intent = new Intent(context, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getService(context, REQUEST_ID, intent,
-                                               PendingIntent.FLAG_NO_CREATE);
+        alarmIntent = PendingIntent.getService(context, REQUEST_ID, intent, 0);
         alarmManager =
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }

@@ -1,5 +1,6 @@
 package com.jcomeau.studytimer;
 
+import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +9,10 @@ import android.widget.Toast;
 
 public class AlarmReceiver extends BroadcastReceiver {
     MediaPlayer mediaPlayer;
+    String TAG = "studytimer";
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "received " + intent);
         mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
         mediaPlayer.start();
         Toast.makeText(context,

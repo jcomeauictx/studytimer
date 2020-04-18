@@ -16,6 +16,7 @@ EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
 	     $(SOURCES)) $(RESOURCES) $(MANIFEST))
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
+TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
 export
 build: $(DIRS) $(R) $(APK)
 clean:
@@ -38,7 +39,7 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
-bin/$(APPNAME).unaligned.apk: bin/classes.dex
+bin/$(APPNAME).unaligned.apk: bin/classes.dex $(MANIFEST)
 	$(TOOLS)/aapt package -f -m \
 	 -F $@ \
 	 -M $(MANIFEST) \
@@ -87,5 +88,8 @@ $(APPPATH) $(DIRS):
 	mkdir -p $@
 mp3find:
 	adb shell 'find / -name "*.mp3" 2>/dev/null'
-studytimer:
+studytimer: .FORCE
+	[ -d $@ ] && mv -f $@ /tmp/$@.$(TIMESTAMP) || true
 	apktool d bin/studytimer.apk
+	[ -d /tmp/$@.$(TIMESTAMP) ] && diff -r $@ /tmp/$@.$(TIMESTAMP) || true
+.FORCE:

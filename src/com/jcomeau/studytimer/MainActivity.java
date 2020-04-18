@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
         if (button.getText().equals("Start")) {
             Log.d(TAG, "start nagging");
             button.setText("Stop");
-	    alarmManager.setInexactRepeating(
+	    alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + NAG_INTERVAL,
                 NAG_INTERVAL,

@@ -10,10 +10,12 @@ R := $(APPPATH)/R.java
 SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
 RESOURCES := $(wildcard res/*/*)
-EDITABLE := $(filter-out $(R), $(SOURCES)) $(RESOURCES) $(MANIFEST)
+RAW := $(wildcard res/*/*.mp3)
+MANIFEST := AndroidManifest.xml
+EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
+	     $(SOURCES)) $(RESOURCES) $(MANIFEST))
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
-MANIFEST := AndroidManifest.xml
 export
 build: $(DIRS) $(R) $(APK)
 clean:
@@ -85,8 +87,3 @@ $(APPPATH) $(DIRS):
 	mkdir -p $@
 mp3find:
 	adb shell 'find / -name "*.mp3" 2>/dev/null'
-res/raw/%.mp3: res/raw
-	remote=$$(echo $$(adb shell 'find / -name $*.mp3 2>/dev/null')) && \
-	 adb pull $$remote $</
-res/%:
-	mkdir -p $@

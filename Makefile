@@ -9,18 +9,19 @@ TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 R := $(APPPATH)/R.java
 SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
-XML := $(wildcard res/*/*.xml)
-EDITABLE := $(filter-out $(R), $(SOURCES)) $(XML)
+RESOURCES := $(wildcard res/*/*)
+EDITABLE := $(filter-out $(R), $(SOURCES)) $(RESOURCES) $(MANIFEST)
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
+MANIFEST := AndroidManifest.xml
 export
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
-$(APPPATH)/R.java: $(XML)
+$(APPPATH)/R.java: $(RESOURCES)
 	$(TOOLS)/aapt package -f -m \
 	 -J src \
-	 -M AndroidManifest.xml \
+	 -M $(MANIFEST) \
 	 -S res \
 	 -I $(ANDROID)
 $(CLASSES): $(SOURCES)
@@ -38,7 +39,7 @@ bin/classes.dex: $(CLASSES)
 bin/$(APPNAME).unaligned.apk: bin/classes.dex
 	$(TOOLS)/aapt package -f -m \
 	 -F $@ \
-	 -M AndroidManifest.xml \
+	 -M $(MANIFEST) \
 	 -S res \
 	 -I $(ANDROID)
 	cp $< .

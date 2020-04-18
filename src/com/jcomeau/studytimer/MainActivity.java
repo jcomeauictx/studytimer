@@ -10,7 +10,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.view.View;
 import android.content.Context;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,7 +31,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this.getApplicationContext();
-        intent = new Intent(context, BroadcastReceiver.class);
+        intent = new Intent(context, AlarmReceiver.class);
         alarmIntent = PendingIntent.getService(context, REQUEST_ID, intent,
                                                PendingIntent.FLAG_NO_CREATE);
         alarmManager =

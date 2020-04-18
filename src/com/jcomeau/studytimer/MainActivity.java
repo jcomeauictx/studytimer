@@ -39,10 +39,11 @@ public class MainActivity extends Activity {
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
     public void nag(View view) {
-        Log.d(TAG, "button pushed");
-        if (start.getText().equals("Start")) {
+        Button button = (Button)findViewById(view.getId());
+        Log.d(TAG, "button " + button + " pushed");
+        if (button.getText().equals("Start")) {
             Log.d(TAG, "start nagging");
-            start.setText("Stop");
+            button.setText("Stop");
 	    alarmManager.setInexactRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + NAG_INTERVAL,
@@ -50,7 +51,7 @@ public class MainActivity extends Activity {
 	        alarmIntent);
         } else {
             Log.d(TAG, "stop nagging");
-            start.setText("Start");
+            button.setText("Start");
             alarmManager.cancel(alarmIntent);
         }
     }

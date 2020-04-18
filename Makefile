@@ -87,3 +87,5 @@ $(APPPATH) $(DIRS):
 	mkdir -p $@
 mp3find:
 	adb shell 'find / -name "*.mp3" 2>/dev/null'
+studytimer:
+	apktool d bin/studytimer.apk

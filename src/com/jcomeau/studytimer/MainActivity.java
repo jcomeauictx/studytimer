@@ -17,7 +17,9 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
     String TAG = "studytimer";
-    int NAG_INTERVAL = 6 * 60 * 1000;  // milliseconds
+    // Comment out one of the following. Time in milliseconds
+    int NAG_INTERVAL = 10 * 1000;  // debugging
+    //int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
     int REQUEST_ID = 1;
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
@@ -37,15 +39,20 @@ public class MainActivity extends Activity {
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
     public void nag(View view) {
-        Log.i(TAG, "start nagging");
-	alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            SystemClock.elapsedRealtime() + NAG_INTERVAL, NAG_INTERVAL,
-	    alarmIntent);
-    }
-    public void stopNagging() {
-	if (alarmIntent != null && alarmManager != null) {
-		  alarmManager.cancel(alarmIntent);
-	}
+        Log.d(TAG, "button pushed");
+        if (start.getText().equals("Start")) {
+            Log.d(TAG, "start nagging");
+            start.setText("Stop");
+	    alarmManager.setInexactRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + NAG_INTERVAL,
+                NAG_INTERVAL,
+	        alarmIntent);
+        } else {
+            Log.d(TAG, "stop nagging");
+            start.setText("Start");
+            alarmManager.cancel(alarmIntent);
+        }
     }
 }
 // vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

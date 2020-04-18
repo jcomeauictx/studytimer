@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         context = this.getApplicationContext();
         intent = new Intent(context, AlarmReceiver.class);
+        Log.d(TAG, "intent: " + intent);
         alarmIntent = PendingIntent.getService(context, REQUEST_ID, intent, 0);
         alarmManager =
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -42,6 +43,7 @@ public class MainActivity extends Activity {
         if (button.getText().equals("Start")) {
             Log.d(TAG, "start nagging");
             button.setText("Stop");
+            Log.d(TAG, "scheduling intent: " + alarmIntent);
 	    alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + NAG_INTERVAL,

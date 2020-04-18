@@ -17,7 +17,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     String TAG = "studytimer";
     // Comment out one of the following. Time in milliseconds
-    int NAG_INTERVAL = 5 * 1000;  // 5 seconds when debugging
+    int NAG_INTERVAL = 1000;  // 1 second when debugging
     //int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
     int REQUEST_ID = 1;
     AlarmManager alarmManager;

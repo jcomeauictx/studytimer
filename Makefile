@@ -83,3 +83,10 @@ test:
 	adb shell am start -n $(PACKAGE)/.MainActivity
 $(APPPATH) $(DIRS):
 	mkdir -p $@
+mp3find:
+	adb shell 'find / -name "*.mp3" 2>/dev/null'
+res/raw/%.mp3: res/raw
+	remote=$$(echo $$(adb shell 'find / -name $*.mp3 2>/dev/null')) && \
+	 adb pull $$remote $</
+res/%:
+	mkdir -p $@

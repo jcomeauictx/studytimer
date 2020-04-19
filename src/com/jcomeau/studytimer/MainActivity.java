@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
 import android.widget.Button;
-import android.widget.Toast;
 import android.media.MediaPlayer;
 
 public class MainActivity extends Activity {
@@ -40,15 +39,12 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             Log.d(APP, "received " + intent);
             mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
-            mediaPlayer.start();
             getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-            Toast.makeText(context,
-                "Are you still studying?",
-                Toast.LENGTH_LONG).show();
+            mediaPlayer.start();
         }
     };
     
@@ -59,7 +55,7 @@ public class MainActivity extends Activity {
         context = this.getApplicationContext();
         intent = new Intent(ACTION);
         registerReceiver(alarmReceiver, new IntentFilter(ACTION));
-        alarmIntent = PendingIntent.getBroadcast(MainActivity.this, REQUEST, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(this, REQUEST, intent, 0);
         alarmManager = (AlarmManager) context.getSystemService(
             Context.ALARM_SERVICE);
     }

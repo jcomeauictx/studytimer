@@ -1,0 +1,42 @@
+04-18 19:13:09.655   202 10980 I BufferQueueProducer: [com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity](this:0xb1282000,id:10025,api:2,p:18729,c:202) queueBuffer: fps=0.20 dur=4963.43 max=4963.43 min=4963.43
+04-18 19:13:09.669 18729 18729 D studytimer: button android.widget.Button{8375cb8 VFED..C.. ...P..I. 132,215-187,263 #7f050000 app:id/start} pushed
+04-18 19:13:09.669 18729 18729 D studytimer: start nagging
+04-18 19:13:09.673 18729 18729 D studytimer: scheduling intent: PendingIntent{572d694: android.os.BinderProxy@9bea53d}
+04-18 19:13:09.674  6678  7278 V SmartStandbyMode_AMS: tcp_test:Alarm Type=2, pkg=com.jcomeau.studytimer, (System.currentTimeMillis()=1587262389674, SystemClock.elapsedRealtime()=2849290923
+04-18 19:13:09.675  6678  7278 V SmartStandbyMode_AMS: skip align pkg: com.jcomeau.studytimer
+04-18 19:13:09.675  6678  7278 V SmartStandbyMode_AMS: tcp_test:type=2,triggerElapsed=2849300923,nominalTrigger=2849300923,windowLength=0,interval=60000,pkg=com.jcomeau.studytimer
+04-18 19:13:09.675  6678  7278 V SmartStandbyMode_AMS: tcp_test:type=2,triggerElapsed=2849300923,windowLength=0,interval=60000,mAlarmMode=2,maxElapsed=2849300923,mNeedGrouping=false,pkg=com.jcomeau.studytimer
+04-18 19:13:09.675  6678  7278 V AlarmManager: APP set(PendingIntent{4438007: PendingIntentRecord{e29d534 com.jcomeau.studytimer broadcastIntent}}) : type=2 triggerAtTime=2849300923 win=0 tElapsed=2849300923 maxElapsed=2849300923 interval=60000 flags=0x1
+04-18 19:13:19.679  6678  6890 D AlarmManager: wakeup alarm = Alarm{34d0459 type 2 when 2849300923 com.jcomeau.studytimer}; package = com.jcomeau.studytimerneedGrouping = true
+04-18 19:13:19.680  6678  6890 V ActivityManager: Broadcast: Intent { act=com.jcomeau.studytimer.NAG flg=0x114 (has extras) } ordered=true userid=0 callerApp=null
+04-18 19:13:19.680  6678  6890 V AlarmManager: sending alarm Alarm{34d0459 type 2 when 2849300923 com.jcomeau.studytimer} success
+04-18 19:13:19.681 18729 18729 D studytimer: received Intent { act=com.jcomeau.studytimer.NAG flg=0x114 (has extras) }
+04-18 19:13:19.712  6325  6325 I MediaPlayerService: [setDataSource_drm_preCheck]line:428 fd=15,path=/data/app/com.jcomeau.studytimer-1/base.apk
+04-18 19:13:19.741 18729 18729 D MediaPlayer: Don't notify duration to com.jcomeau.studytimer!
+04-18 19:13:20.019  6678  7318 I NotificationService: enqueueToast pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@b1e96cc duration=1
+04-18 19:13:20.019  6678  7318 D AppOps  : noteOperation: allowing code 11 uid 10181 package com.jcomeau.studytimer
+04-18 19:13:20.041  6678  7318 D NotificationService: Show pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@b1e96cc
+04-18 19:13:20.050  6678  6688 D AppOps  : startOperation: allowing code 45 uid 10181 package com.jcomeau.studytimer
+04-18 19:13:20.106  6678  7332 V WindowManager: findFocusedWindow: Found new focus @ 7 = Window{d50b172 u0 com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity}
+04-18 19:13:20.173   202 10980 I BufferQueueProducer: [Toast](this:0xb129c000,id:10026,api:2,p:18729,c:202) connect(P): api=2 producer=(18729:com.jcomeau.studytimer) producerControlledByApp=true
+04-18 19:13:23.542  6678  6678 D NotificationService: Timeout pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@b1e96cc
+04-18 19:13:23.550  6678  7318 V WindowManager: findFocusedWindow: Found new focus @ 7 = Window{d50b172 u0 com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity}
+04-18 19:14:19.677  6678  6890 D AlarmManager: wakeup alarm = Alarm{d4fa339 type 2 when 2849360923 com.jcomeau.studytimer}; package = com.jcomeau.studytimerneedGrouping = true
+04-18 19:14:19.678  6678  6890 V ActivityManager: Broadcast: Intent { act=com.jcomeau.studytimer.NAG flg=0x114 (has extras) } ordered=true userid=0 callerApp=null
+04-18 19:14:19.678  6678  6890 V AlarmManager: sending alarm Alarm{d4fa339 type 2 when 2849360923 com.jcomeau.studytimer} success
+04-18 19:14:19.684 18729 18729 D studytimer: received Intent { act=com.jcomeau.studytimer.NAG flg=0x114 (has extras) }
+04-18 19:14:19.695  6325  6721 I MediaPlayerService: [setDataSource_drm_preCheck]line:428 fd=24,path=/data/app/com.jcomeau.studytimer-1/base.apk
+04-18 19:14:19.701 18729 18729 D MediaPlayer: Don't notify duration to com.jcomeau.studytimer!
+04-18 19:14:19.731  6678  6692 I NotificationService: enqueueToast pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@5ba0d7e duration=1
+04-18 19:14:19.731  6678  6692 D AppOps  : noteOperation: allowing code 11 uid 10181 package com.jcomeau.studytimer
+04-18 19:14:19.741  6678  6692 D NotificationService: Show pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@5ba0d7e
+04-18 19:14:19.753  6678  9192 D AppOps  : startOperation: allowing code 45 uid 10181 package com.jcomeau.studytimer
+04-18 19:14:19.765  6678  7279 V WindowManager: findFocusedWindow: Found new focus @ 7 = Window{d50b172 u0 com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity}
+04-18 19:14:19.841   202   432 I BufferQueueProducer: [Toast](this:0xb1293400,id:10027,api:2,p:18729,c:202) connect(P): api=2 producer=(18729:com.jcomeau.studytimer) producerControlledByApp=true
+04-18 19:14:23.241  6678  6678 D NotificationService: Timeout pkg=com.jcomeau.studytimer callback=android.app.ITransientNotification$Stub$Proxy@5ba0d7e
+04-18 19:14:23.246  6678  9192 V WindowManager: findFocusedWindow: Found new focus @ 7 = Window{d50b172 u0 com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity}
+04-18 19:14:29.162   202  1583 I BufferQueueProducer: [com.jcomeau.studytimer/com.jcomeau.studytimer.MainActivity](this:0xb1282000,id:10025,api:2,p:18729,c:202) queueBuffer: fps=0.03 dur=79506.83 max=79474.18 min=32.65
+04-18 19:14:29.257 18729 18729 D studytimer: button android.widget.Button{8375cb8 VFED..C.. ...P..I. 133,215-187,263 #7f050000 app:id/start} pushed
+04-18 19:14:29.258 18729 18729 D studytimer: stop nagging
+04-18 19:14:29.259  6678  7313 D AlarmManager: manual remove option = PendingIntent{965838a: PendingIntentRecord{e29d534 com.jcomeau.studytimer broadcastIntent}}
+04-18 19:14:29.259  6678  7313 D AlarmManager: remove(operation) changed bounds; rebatching operation = PendingIntent{965838a: PendingIntentRecord{e29d534 com.jcomeau.studytimer broadcastIntent}}

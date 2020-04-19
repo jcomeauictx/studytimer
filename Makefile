@@ -20,6 +20,7 @@ DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
 DEBUG ?= --debug-mode
 export
+rebuild: clean build
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)

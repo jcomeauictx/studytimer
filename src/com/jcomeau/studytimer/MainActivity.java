@@ -52,10 +52,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this.getApplicationContext();
+        context = getApplicationContext();
         intent = new Intent(ACTION);
         registerReceiver(alarmReceiver, new IntentFilter(ACTION));
-        alarmIntent = PendingIntent.getBroadcast(this, REQUEST, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(context, REQUEST, intent, 0);
         alarmManager = (AlarmManager) context.getSystemService(
             Context.ALARM_SERVICE);
     }

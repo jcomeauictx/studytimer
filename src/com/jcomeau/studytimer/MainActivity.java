@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
                 "Are you still studying?",
                 TextToSpeech.QUEUE_FLUSH,
                 null);
+            window.clearFlags(SCREEN_ON);
         }
     };
     

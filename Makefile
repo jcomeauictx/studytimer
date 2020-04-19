@@ -1,4 +1,3 @@
-PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(PATH)
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.jcomeau.$(APPNAME)
 APPPATH := src/$(subst .,/,$(PACKAGE))
@@ -6,6 +5,7 @@ MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
+PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
 R := $(APPPATH)/R.java
 SOURCES = $(wildcard $(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
@@ -18,12 +18,13 @@ EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
+DEBUG ?= --debug-mode
 export
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
 $(APPPATH)/R.java: $(RESOURCES)
-	$(TOOLS)/aapt package -f -m \
+	$(TOOLS)/aapt package $(DEBUG) -f -m \
 	 -J src \
 	 -M $(MANIFEST) \
 	 -S res \
@@ -41,7 +42,7 @@ bin/classes.dex: $(CLASSES)
 	 --output=$@ \
 	 obj
 bin/$(APPNAME).unaligned.apk: bin/classes.dex $(MANIFEST)
-	$(TOOLS)/aapt package -f -m \
+	$(TOOLS)/aapt package -f -m $(DEBUG) \
 	 -F $@ \
 	 -M $(MANIFEST) \
 	 -S res \
@@ -94,3 +95,5 @@ studytimer: .FORCE
 	apktool d bin/studytimer.apk
 	[ -d /tmp/$@.$(TIMESTAMP) ] && diff -r $@ /tmp/$@.$(TIMESTAMP) || true
 .FORCE:
+shell:
+	bash -i

@@ -1,11 +1,13 @@
 <?xml version='1.0'?>
-<manifest xmlns:a='http://schemas.android.com/apk/res/android' package='com.jcomeau.studytimer' a:versionCode='0' a:versionName='0'>
-    <application a:label='@string/app_name'>
-        <activity a:name='.MainActivity'>
-             <intent-filter>
-                <category a:name='android.intent.category.LAUNCHER'/>
-                <action a:name='android.intent.action.MAIN'/>
-             </intent-filter>
-        </activity>
-    </application>
+<manifest xmlns:android='http://schemas.android.com/apk/res/android'
+  package='com.jcomeau.studytimer'
+  android:versionCode='0' android:versionName='0'>
+ <application android:label='@string/app_name'>
+  <activity android:name='.MainActivity'>
+   <intent-filter>
+    <category android:name='android.intent.category.LAUNCHER'/>
+    <action android:name='android.intent.action.MAIN'/>
+   </intent-filter>
+  </activity>
+ </application>
 </manifest>

@@ -12,8 +12,9 @@ CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
 RESOURCES := $(wildcard res/*/*)
 RAW := $(wildcard res/*/*.mp3)
 MANIFEST := AndroidManifest.xml
+OTHER := README.md
 EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
-	     $(SOURCES)) $(RESOURCES) $(MANIFEST))
+	     $(SOURCES)) $(RESOURCES) $(MANIFEST)) $(OTHER)
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)

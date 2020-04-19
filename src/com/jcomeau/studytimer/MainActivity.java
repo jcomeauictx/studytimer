@@ -36,7 +36,6 @@ public class MainActivity extends Activity {
     int REQUEST = 1;  // request ID
     int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
@@ -49,12 +48,12 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             Log.d(APP, "received " + intent);
             Window window = getWindow();
-            window.addFlags(SCREEN_ON);
+            window.clearFlags(SCREEN_ON);
             textToSpeech.speak(
                 "Are you still studying?",
                 TextToSpeech.QUEUE_FLUSH,
                 null);
-            window.clearFlags(SCREEN_ON);
+            window.addFlags(SCREEN_ON);
         }
     };
     

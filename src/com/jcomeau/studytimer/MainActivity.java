@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         intent = new Intent(context, AlarmReceiver.class);
         intent.setAction("com.jcomeau.studytimer.NAG");
         Log.d(TAG, "intent: " + intent);
-        alarmIntent = PendingIntent.getBroadcast(context, REQUEST, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(MainActivity.this, REQUEST, intent, 0);
         alarmManager = (AlarmManager) context.getSystemService(
             Context.ALARM_SERVICE);
     }

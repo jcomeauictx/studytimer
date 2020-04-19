@@ -9,13 +9,17 @@ import android.os.SystemClock;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.view.View;
+import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
 import android.widget.Button;
 import android.widget.Toast;
+import android.media.MediaPlayer;
 
 public class MainActivity extends Activity {
     String TAG = "studytimer";
+    String ACTION = "com.jcomeau.studytimer.NAG";
     // Comment out one of the following. Time in milliseconds
     int NAG_INTERVAL = 10 * 1000;  // 10 seconds when debugging
     //int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
@@ -25,15 +29,26 @@ public class MainActivity extends Activity {
     Context context;
     Intent intent;
     Button start;
+    BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
+        MediaPlayer mediaPlayer;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "received " + intent);
+            mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
+            mediaPlayer.start();
+            Toast.makeText(context,
+                "Are you still studying?",
+                Toast.LENGTH_LONG).show();
+        }
+    };
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this.getApplicationContext();
-        intent = new Intent(context, AlarmReceiver.class);
-        intent.setAction("com.jcomeau.studytimer.NAG");
-        Log.d(TAG, "intent: " + intent);
+        intent = new Intent(ACTION);
+        registerReceiver(alarmReceiver, new IntentFilter(ACTION));
         alarmIntent = PendingIntent.getBroadcast(MainActivity.this, REQUEST, intent, 0);
         alarmManager = (AlarmManager) context.getSystemService(
             Context.ALARM_SERVICE);

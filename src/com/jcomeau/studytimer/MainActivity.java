@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.view.View;
+import android.view.WindowManager;
 import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,11 @@ public class MainActivity extends Activity {
             Log.d(APP, "received " + intent);
             mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
             mediaPlayer.start();
+            getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             Toast.makeText(context,
                 "Are you still studying?",
                 Toast.LENGTH_LONG).show();

@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
         context = this.getApplicationContext();
         intent = new Intent(context, AlarmReceiver.class);
         Log.d(TAG, "intent: " + intent);
-        alarmIntent = PendingIntent.getService(context, REQUEST_ID, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(context, REQUEST_ID, intent, 0);
         alarmManager =
        	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }

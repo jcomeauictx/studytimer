@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     // Comment out one of the following. Time in milliseconds
     int NAG_INTERVAL = 10 * 1000;  // 10 seconds when debugging
     //int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
-    int REQUEST_ID = 1;
+    int REQUEST = 1;  // request ID
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context context;
@@ -32,10 +32,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         context = this.getApplicationContext();
         intent = new Intent(context, AlarmReceiver.class);
+        intent.setAction("com.jcomeau.studytimer.NAG");
         Log.d(TAG, "intent: " + intent);
-        alarmIntent = PendingIntent.getBroadcast(context, REQUEST_ID, intent, 0);
-        alarmManager =
-       	    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmIntent = PendingIntent.getBroadcast(context, REQUEST, intent, 0);
+        alarmManager = (AlarmManager) context.getSystemService(
+            Context.ALARM_SERVICE);
     }
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());

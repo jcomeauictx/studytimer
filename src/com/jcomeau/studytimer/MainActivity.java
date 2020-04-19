@@ -60,8 +60,11 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(APP, "onCreate starting");
         View view = findViewById(R.layout.activity_main);
+        Log.d(APP, "view: " + view);
         Button button = (Button)findViewById(R.id.start);
+        Log.d(APP, "button: " + button);
         Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
         button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
         super.onCreate(savedInstanceState);

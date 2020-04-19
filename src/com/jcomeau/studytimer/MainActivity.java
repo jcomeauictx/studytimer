@@ -2,11 +2,12 @@ package com.jcomeau.studytimer;
 // sample code from https://medium.com/@authmane512/
 // how-to-build-an-apk-from-command-line-without-ide-7260e1e22676
 // and other samples on StackOverflow and elsewhere
+import java.util.Locale;
 import android.util.Log;
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.app.AlarmManager;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.view.View;
 import android.view.Window;
@@ -15,9 +16,10 @@ import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
+import android.content.pm.ApplicationInfo;
 import android.widget.Button;
 import android.media.MediaPlayer;
-import android.content.pm.ApplicationInfo;
+import android.speech.tts.TextToSpeech;
 
 public class MainActivity extends Activity {
     String APP = "studytimer";
@@ -40,16 +42,17 @@ public class MainActivity extends Activity {
     Context appContext;
     Intent intent;
     Button start;
+    TextToSpeech textToSpeech;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
-        MediaPlayer mediaPlayer;
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(APP, "received " + intent);
-            mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
             Window window = getWindow();
-            window.clearFlags(SCREEN_ON);
             window.addFlags(SCREEN_ON);
-            mediaPlayer.start();
+            textToSpeech.speak(
+                "Are you still studying?",
+                TextToSpeech.QUEUE_FLUSH,
+                null);
         }
     };
     
@@ -72,6 +75,16 @@ public class MainActivity extends Activity {
             NAG_INTERVAL = 6 * 60 * 1000;  // .1 hour (6 minutes) for normal use
         }
         Log.d(APP, "DEBUG=" + DEBUG);
+        textToSpeech = new TextToSpeech(getApplicationContext(),
+                new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    // a British voice somehow isn't quite so aggravating
+                    textToSpeech.setLanguage(Locale.UK);
+                }
+            }
+        });
     }
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());

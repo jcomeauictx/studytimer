@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
         Log.d(APP, "button " + button + " pushed");
         if (STOPPED) {
             Log.d(APP, "start nagging");
-            button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
+            button.setText(BUTTON_TEXT[0]);
             Log.d(APP, "scheduling intent: " + alarmIntent);
 	    alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
 	        alarmIntent);
         } else {
             Log.d(APP, "stop nagging");
-            button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
+            button.setText(BUTTON_TEXT[1]);
             alarmManager.cancel(alarmIntent);
         }
         STOPPED = !STOPPED;

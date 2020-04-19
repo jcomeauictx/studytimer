@@ -9,7 +9,7 @@
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
     android:onClick="nag"
-    android:text="Start"
+    android:text="Uninitialized"
     tools:context=".MainActivity" />
 
 </RelativeLayout>

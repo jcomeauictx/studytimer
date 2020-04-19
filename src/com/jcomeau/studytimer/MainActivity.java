@@ -37,11 +37,12 @@ public class MainActivity extends Activity {
     int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+    String[] BUTTON_TEXT = {"Stop", "Start"};
+    boolean STOPPED = true;
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context appContext;
     Intent intent;
-    Button start;
     TextToSpeech textToSpeech;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
@@ -59,8 +60,12 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        View view = findViewById(R.layout.activity_main);
+        Button button = (Button)findViewById(R.id.start);
+        Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
+        button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(view);
         appContext = getApplicationContext();
         intent = new Intent(ACTION);
         registerReceiver(alarmReceiver, new IntentFilter(ACTION));
@@ -90,9 +95,9 @@ public class MainActivity extends Activity {
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());
         Log.d(APP, "button " + button + " pushed");
-        if (button.getText().equals("Start")) {
+        if (STOPPED) {
             Log.d(APP, "start nagging");
-            button.setText("Stop");
+            button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
             Log.d(APP, "scheduling intent: " + alarmIntent);
 	    alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -101,9 +106,10 @@ public class MainActivity extends Activity {
 	        alarmIntent);
         } else {
             Log.d(APP, "stop nagging");
-            button.setText("Start");
+            button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
             alarmManager.cancel(alarmIntent);
         }
+        STOPPED = !STOPPED;
     }
 }
 // vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

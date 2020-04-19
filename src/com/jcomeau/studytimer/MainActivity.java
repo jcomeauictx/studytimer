@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.content.IntentFilter;
 import android.content.Context;
@@ -16,21 +17,27 @@ import android.content.Intent;
 import android.content.BroadcastReceiver;
 import android.widget.Button;
 import android.media.MediaPlayer;
+import android.content.pm.ApplicationInfo;
 
 public class MainActivity extends Activity {
     String APP = "studytimer";
     String PACKAGE = "com.jcomeau." + APP;
     String ACTION = PACKAGE + ".NAG";
-    // Comment out one of the following. Time in milliseconds
+    // https://medium.com/@elye.project/
+    // checking-debug-build-the-right-way-d12da1098120
+    boolean DEBUG;
+    // Time is in milliseconds
     // No matter what you set it to, the first alarm comes in no earlier
-    // than 4 seconds on Android 6, and the 2nd no earlier than 1 minute after
-    // the first.
-    //int NAG_INTERVAL = 10 * 1000;  // 10 seconds when debugging
-    int NAG_INTERVAL = 6 * 60 * 1000;  // normal use
+    // than 4 seconds on Android 6, and the 2nd no earlier than 1 minute
+    // after the first. (This is with alarmManager.setRepeating())
+    int NAG_INTERVAL;
     int REQUEST = 1;  // request ID
+    int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
-    Context context;
+    Context appContext;
     Intent intent;
     Button start;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
@@ -39,11 +46,9 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             Log.d(APP, "received " + intent);
             mediaPlayer = mediaPlayer.create(context, R.raw.alarmclock2);
-            getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+            Window window = getWindow();
+            window.clearFlags(SCREEN_ON);
+            window.addFlags(SCREEN_ON);
             mediaPlayer.start();
         }
     };
@@ -52,12 +57,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = getApplicationContext();
+        appContext = getApplicationContext();
         intent = new Intent(ACTION);
         registerReceiver(alarmReceiver, new IntentFilter(ACTION));
-        alarmIntent = PendingIntent.getBroadcast(context, REQUEST, intent, 0);
-        alarmManager = (AlarmManager) context.getSystemService(
+        alarmIntent = PendingIntent.getBroadcast(
+            appContext, REQUEST, intent, 0);
+        alarmManager = (AlarmManager) appContext.getSystemService(
             Context.ALARM_SERVICE);
+        DEBUG = ((appContext.getApplicationInfo().flags &
+                 ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+        if (DEBUG) {
+            NAG_INTERVAL = 60 * 1000;  // 1 minute when debugging
+        } else {
+            NAG_INTERVAL = 6 * 60 * 1000;  // .1 hour (6 minutes) for normal use
+        }
+        Log.d(APP, "DEBUG=" + DEBUG);
     }
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());

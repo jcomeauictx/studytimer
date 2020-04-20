@@ -70,7 +70,6 @@ public class MainActivity extends Activity {
         }
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         Log.d(APP, "button: " + button);
         Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
         button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
@@ -109,6 +108,7 @@ public class MainActivity extends Activity {
 
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());
+        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         Log.d(APP, "button " + button + " pushed");
         if (STOPPED) {
             Log.d(APP, "start nagging");
@@ -119,10 +119,12 @@ public class MainActivity extends Activity {
                 SystemClock.elapsedRealtime() + NAG_INTERVAL,
                 NAG_INTERVAL,
 	        alarmIntent);
+            chronometer.start();
         } else {
             Log.d(APP, "stop nagging");
             button.setText(BUTTON_TEXT[1]);
             alarmManager.cancel(alarmIntent);
+            chronometer.stop();
         }
         STOPPED = !STOPPED;
     }

@@ -106,6 +106,7 @@ public class MainActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         elapsed = milliseconds(chronometer.getText().toString());
         state.putBoolean("STOPPED", STOPPED);
         state.putLong("elapsed", elapsed);

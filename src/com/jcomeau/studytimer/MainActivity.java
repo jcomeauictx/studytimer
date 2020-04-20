@@ -73,6 +73,7 @@ public class MainActivity extends Activity {
         }
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
+        chronometer = (Chronometer)findViewById(R.id.chronometer);
         Log.d(APP, "button: " + button);
         Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
         button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
@@ -91,6 +92,11 @@ public class MainActivity extends Activity {
             NAG_INTERVAL = 6 * 60 * 1000;  // .1 hour (6 minutes) for normal use
         }
         Log.d(APP, "DEBUG=" + DEBUG);
+        if (!STOPPED) {
+            Log.d(APP, "restarting chronometer");
+            chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
+            chronometer.start();
+        }
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override
@@ -113,7 +119,6 @@ public class MainActivity extends Activity {
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         Log.d(APP, "saving instance state");
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         elapsed = milliseconds(chronometer.getText().toString());
         state.putBoolean("STOPPED", STOPPED);
         state.putLong("elapsed", elapsed);
@@ -132,7 +137,6 @@ public class MainActivity extends Activity {
 
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());
-        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         Log.d(APP, "button " + button + " pushed");
         if (STOPPED) {
             Log.d(APP, "start nagging");

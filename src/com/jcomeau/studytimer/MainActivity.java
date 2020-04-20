@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
     int REQUEST = 1;  // request ID
     int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
     String[] BUTTON_TEXT = {"Stop", "Start"};
     boolean STOPPED;
     AlarmManager alarmManager;
@@ -50,13 +50,10 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(APP, "received " + intent);
-            Window window = getWindow();
-            window.clearFlags(SCREEN_ON);
             textToSpeech.speak(
                 "Are you still studying?",
                 TextToSpeech.QUEUE_FLUSH,
                 null);
-            window.addFlags(SCREEN_ON);
         }
     };
     
@@ -66,6 +63,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             STOPPED = true;
+            Window window = getWindow();
+            window.addFlags(SCREEN_ON);
         } else {
             STOPPED = savedInstanceState.getBoolean("STOPPED", true);
         }

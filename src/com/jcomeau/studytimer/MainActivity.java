@@ -104,6 +104,12 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        unregisterReceiver(alarmReceiver);
+        super.onDestroy();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         Log.d(APP, "saving instance state");

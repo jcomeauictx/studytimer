@@ -114,7 +114,8 @@ public class MainActivity extends Activity {
     public long milliseconds(String time) {
         // convert string time to milliseconds
         // https://stackoverflow.com/a/1291253/493161
-        String array[] = (time + "0:").split(":");
+        String array[] = ("0:" + time).split(":");
+        Log.d(APP, "array: " + array);
         long seconds = Integer.parseInt(array[array.length - 1]);
         long minutes = Integer.parseInt(array[array.length - 2]);
         long hours = Integer.parseInt(array[array.length - 3]);

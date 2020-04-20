@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
     String[] BUTTON_TEXT = {"Stop", "Start"};
-    boolean STOPPED = true;
+    boolean STOPPED;
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context appContext;
@@ -62,6 +62,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(APP, "onCreate starting");
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            STOPPED = true;
+        } else {
+            STOPPED = savedInstanceState.getBoolean("STOPPED", true);
+        }
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
         Log.d(APP, "button: " + button);
@@ -93,6 +98,13 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putBoolean("STOPPED", STOPPED);
+    }
+
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());
         Log.d(APP, "button " + button + " pushed");

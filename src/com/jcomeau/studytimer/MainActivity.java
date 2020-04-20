@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.BroadcastReceiver;
 import android.content.pm.ApplicationInfo;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.media.MediaPlayer;
 import android.speech.tts.TextToSpeech;
 
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
     Context appContext;
     Intent intent;
     TextToSpeech textToSpeech;
+    Chronometer chronometer;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -69,6 +71,7 @@ public class MainActivity extends Activity {
         }
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
+        Chronometer chronometer = (Chronometer)findViewById(R.id.chronometer);
         Log.d(APP, "button: " + button);
         Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
         button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);

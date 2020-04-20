@@ -64,8 +64,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             STOPPED = true;
-            Window window = getWindow();
-            window.addFlags(SCREEN_ON);
             elapsed = 0;
         } else {
             STOPPED = savedInstanceState.getBoolean("STOPPED", true);
@@ -87,16 +85,19 @@ public class MainActivity extends Activity {
         DEBUG = ((appContext.getApplicationInfo().flags &
                  ApplicationInfo.FLAG_DEBUGGABLE) != 0);
         if (DEBUG) {
-            NAG_INTERVAL = 60 * 1000;  // 1 minute when debugging
+            NAG_INTERVAL = 90 * 1000;  // 1.5 minutes when debugging
         } else {
             NAG_INTERVAL = 6 * 60 * 1000;  // .1 hour (6 minutes) for normal use
         }
         Log.d(APP, "DEBUG=" + DEBUG);
+        if (elapsed > 0) {
+            chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
+        }
         if (!STOPPED) {
             Log.d(APP, "restarting chronometer");
-            chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
         }
+        getWindow().addFlags(SCREEN_ON);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

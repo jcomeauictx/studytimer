@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
     Intent intent;
     TextToSpeech textToSpeech;
     Chronometer chronometer;
+    long elapsed;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -65,8 +66,10 @@ public class MainActivity extends Activity {
             STOPPED = true;
             Window window = getWindow();
             window.addFlags(SCREEN_ON);
+            elapsed = 0;
         } else {
             STOPPED = savedInstanceState.getBoolean("STOPPED", true);
+            elapsed = savedInstanceState.getLong("elapsed", 0);
         }
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
@@ -103,7 +106,19 @@ public class MainActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+        elapsed = milliseconds(chronometer.getText().toString());
         state.putBoolean("STOPPED", STOPPED);
+        state.putLong("elapsed", elapsed);
+    }
+
+    public long milliseconds(String time) {
+        // convert string time to milliseconds
+        // https://stackoverflow.com/a/1291253/493161
+        String array[] = (time + "0:").split(":");
+        long seconds = Integer.parseInt(array[array.length - 1]);
+        long minutes = Integer.parseInt(array[array.length - 2]);
+        long hours = Integer.parseInt(array[array.length - 3]);
+        return ((((hours * 60) + minutes) * 60) + seconds) * 1000;
     }
 
     public void nag(View view) {
@@ -119,12 +134,14 @@ public class MainActivity extends Activity {
                 SystemClock.elapsedRealtime() + NAG_INTERVAL,
                 NAG_INTERVAL,
 	        alarmIntent);
+            chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
         } else {
             Log.d(APP, "stop nagging");
             button.setText(BUTTON_TEXT[1]);
             alarmManager.cancel(alarmIntent);
             chronometer.stop();
+            elapsed = milliseconds(chronometer.getText().toString());
         }
         STOPPED = !STOPPED;
     }

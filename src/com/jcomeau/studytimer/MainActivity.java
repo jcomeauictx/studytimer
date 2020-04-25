@@ -17,6 +17,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.media.MediaPlayer;
@@ -47,6 +49,7 @@ public class MainActivity extends Activity {
     TextToSpeech textToSpeech;
     Chronometer chronometer;
     long elapsed;
+    String version;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -72,6 +75,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         Button button = (Button)findViewById(R.id.start);
         chronometer = (Chronometer)findViewById(R.id.chronometer);
+        try {
+            PackageInfo packageInfo = this.getPackageManager()
+                .getPackageInfo(getPackageName(), 0);
+            version = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException problem) {
+            Log.e(APP, "Error: " + problem);
+            version = "unknown";
+        }
+        Log.d(APP, "version: " + version);
         Log.d(APP, "button: " + button);
         Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
         button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);

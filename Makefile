@@ -18,7 +18,23 @@ EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
 APK := bin/$(APPNAME).apk
 DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
-DEBUG ?= --debug-mode
+DEBUG ?= #--debug-mode
+VERSION := git-$(shell git describe --always 2>/dev/null)
+#/home/jcomeau/Downloads/3rd Year Clancey's Outlaws MP3
+#/home/jcomeau/Downloads/3rd Year Clancey's Outlaws PDF
+#/home/jcomeau/Downloads/4th Year Clancey's Outlaws MP3
+#/home/jcomeau/Downloads/4th Year Clancey's Outlaws PDF
+#/home/jcomeau/Downloads/1st Year Clancey's Outlaws MP3
+#/home/jcomeau/Downloads/1st Year Clancey's Outlaws PDF
+#/home/jcomeau/Downloads/2nd Year Clancey's Outlaws MP3
+#/home/jcomeau/Downloads/2nd Year Clancey's Outlaws PDF
+# USBKEY is mount point of NWCUlaw.edu USB key, or to where it was copied
+USBKEY ?= $(HOME)/Downloads
+# SDCARD is your phone's external data directory (even if really internal)
+SDCARD ?= /sdcard
+SCHOOL ?= nwculaw.edu
+YEAR ?= 1st
+AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
 export
 all: rebuild reinstall
 rebuild: clean build
@@ -27,6 +43,7 @@ clean:
 	rm -rf $(R) $(DIRS)
 $(APPPATH)/R.java: $(RESOURCES)
 	$(TOOLS)/aapt package $(DEBUG) -f -m \
+	 --version-name $(VERSION) \
 	 -J src \
 	 -M $(MANIFEST) \
 	 -S res \
@@ -43,15 +60,16 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
-bin/$(APPNAME).unaligned.apk: bin/classes.dex $(MANIFEST)
+bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	$(TOOLS)/aapt package -f -m $(DEBUG) \
+	 --version-name $(VERSION) \
 	 -F $@ \
 	 -M $(MANIFEST) \
 	 -S res \
 	 -I $(ANDROID)
-	cp $< .
-	$(TOOLS)/aapt add bin/$(APPNAME).unaligned.apk classes.dex
-	rm $(<F)
+	cp $< .  # copy dex here temporarily
+	$(TOOLS)/aapt add $@ classes.dex
+	rm $(<F)  # remove the copy
 edit: $(EDITABLE)
 	vi $+
 env:
@@ -59,26 +77,29 @@ env:
 version:
 	java -version
 list:
-	$(TOOLS)/aapt list bin/$(APPNAME).unaligned.apk
+	$(TOOLS)/zipalign -cv 4 $(APK)
 keys:
 	@echo Enter password as: $(APPNAME)
 	keytool \
 	 -genkeypair \
-	 -validity 365 \
+	 -validity 10000 \
 	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048
-$(APK): $(APK:.apk=.unsigned.apk)
+$(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo Enter password as: $(APPNAME)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
 	 -keystore $(HOME)/$(APPNAME)key.keystore \
-	 $< mykey
+	 $< $(APPNAME)
 	mv $< $@
-%.unsigned.apk: %.unaligned.apk
+$(APK): $(APK:.apk=.signed.apk)
+	rm -f $@
 	$(TOOLS)/zipalign -f 4 $< $@
+	cp -i $@ ~/Downloads/
 tools:
 	ls $(TOOLS)
 install:
@@ -88,7 +109,7 @@ uninstall:
 reinstall: uninstall install
 test:
 	adb shell am start -n $(PACKAGE)/.MainActivity
-$(APPPATH) $(DIRS):
+$(APPPATH) $(DIRS) $(HOME)/etc/ssl:
 	mkdir -p $@
 mp3find:
 	adb shell 'find / -name "*.mp3" 2>/dev/null'
@@ -99,3 +120,13 @@ studytimer: .FORCE
 .FORCE:
 shell:
 	bash -i
+exportkey: $(HOME)/etc/ssl
+	keytool -export -rfc \
+	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 -alias $(APPNAME) \
+	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
+copyaudio:
+	@echo Copying mp3 files from USB key to device
+	for directory in $(wildcard "$(AUDIO/*")); do \
+	 echo Copying audio from "$$directory" to phone; \
+	done

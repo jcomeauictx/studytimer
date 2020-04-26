@@ -33,7 +33,7 @@ USBKEY ?= $(HOME)/Downloads
 # SDCARD is your phone's external data directory (even if really internal)
 SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
-YEAR ?= 1st
+YEAR ?= 1
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
 export
 all: rebuild reinstall
@@ -127,6 +127,6 @@ exportkey: $(HOME)/etc/ssl
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
 copyaudio:
 	@echo Copying mp3 files from USB key to device
-	for directory in $(wildcard "$(AUDIO/*")); do \
+	for directory in "$(AUDIO)"/*; do \
 	 echo Copying audio from "$$directory" to phone; \
 	done

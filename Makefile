@@ -1,13 +1,13 @@
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.jcomeau.$(APPNAME)
-APPPATH := src/$(subst .,/,$(PACKAGE))
+APPPATH := $(subst .,/,$(PACKAGE))
 MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
-R := $(APPPATH)/R.java
-SOURCES = $(wildcard $(APPPATH)/*.java)
+R := src/$(APPPATH)/R.java
+SOURCES = $(wildcard src/$(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
 RESOURCES := $(wildcard res/*/*)
 RAW := $(wildcard res/*/*.mp3)
@@ -42,7 +42,7 @@ rebuild: clean build
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
-$(APPPATH)/R.java: $(RESOURCES)
+src/$(APPPATH)/R.java: $(RESOURCES)
 	$(TOOLS)/aapt package $(DEBUG) -f -m \
 	 --version-name $(VERSION) \
 	 -J src \
@@ -110,7 +110,7 @@ uninstall:
 reinstall: uninstall install
 test:
 	adb shell am start -n $(PACKAGE)/.MainActivity
-$(APPPATH) $(DIRS) $(HOME)/etc/ssl:
+src/$(APPPATH) $(DIRS) $(HOME)/etc/ssl:
 	mkdir -p $@
 mp3find:
 	adb shell 'find / -name "*.mp3" 2>/dev/null'

@@ -35,6 +35,7 @@ SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
 YEAR ?= 1
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
+STORAGE := $(SDCARD)/$(APPPATH)/$(SCHOOL)/$(YEAR)
 export
 all: rebuild reinstall
 rebuild: clean build
@@ -129,4 +130,6 @@ copyaudio:
 	@echo Copying mp3 files from USB key to device
 	for directory in "$(AUDIO)"/*; do \
 	 echo Copying audio from "$$directory" to phone; \
+	 adb shell mkdir -m 777 -p "$(STORAGE)"; \
+	 adb push "$$directory" "$(STORAGE)"; \
 	done

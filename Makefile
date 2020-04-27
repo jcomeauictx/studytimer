@@ -131,5 +131,5 @@ copyaudio:
 	for directory in "$(AUDIO)"/*; do \
 	 echo Copying audio from "$$directory" to phone; \
 	 adb shell mkdir -m 777 -p "$(STORAGE)"; \
-	 adb push "$$directory" "$(STORAGE)"; \
+	 adb push "$$directory" "$(STORAGE)"/"$$(basename "$$directory")"; \
 	done

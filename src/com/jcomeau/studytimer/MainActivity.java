@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.media.MediaPlayer;
 import android.speech.tts.TextToSpeech;
+import java.io.File;
 
 public class MainActivity extends Activity {
     String APP = "studytimer";
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
     Chronometer chronometer;
     long elapsed;
     String version;
+    File externalFiles;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -110,6 +112,8 @@ public class MainActivity extends Activity {
             chronometer.start();
         }
         getWindow().addFlags(SCREEN_ON);
+        externalFiles = appContext.getExternalFilesDir(null);
+        Log.d(APP, "External files path: " + externalFiles);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

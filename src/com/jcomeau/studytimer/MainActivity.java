@@ -6,6 +6,7 @@ import java.util.Locale;
 import android.util.Log;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.Environment;
 import android.app.AlarmManager;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -51,6 +52,8 @@ public class MainActivity extends Activity {
     Chronometer chronometer;
     long elapsed;
     String version;
+    Environment environment;
+    File internalFiles;
     File externalFiles;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
@@ -112,7 +115,10 @@ public class MainActivity extends Activity {
             chronometer.start();
         }
         getWindow().addFlags(SCREEN_ON);
-        externalFiles = appContext.getExternalFilesDir(null);
+        environment = new Environment();
+        internalFiles = appContext.getExternalFilesDir(null);
+        Log.d(APP, "Internal files path: " + internalFiles);
+        externalFiles = environment.getExternalStorageDirectory();
         Log.d(APP, "External files path: " + externalFiles);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {

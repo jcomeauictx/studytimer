@@ -75,6 +75,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         studyButton = (Button)findViewById(R.id.study);
         listenButton = (Button)findViewById(R.id.listen);
+        Log.d(APP, "buttons: " + studyButton + ", " + listenButton);
         if (savedInstanceState == null) {
             elapsed = 0;
             active = null;

@@ -58,6 +58,9 @@ public class MainActivity extends Activity {
     Environment environment;
     File internalFiles;
     File externalFiles;
+    File[] schools;
+    File[] years;
+    File[] classes;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -128,10 +131,16 @@ public class MainActivity extends Activity {
         }
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
-        internalFiles = appContext.getExternalFilesDir(null);
+        internalFiles = new File(appContext.getExternalFilesDir(null),
+                                 PACKAGE.replace(".", File.separator));
         Log.d(APP, "Internal files path: " + internalFiles);
-        externalFiles = environment.getExternalStorageDirectory();
+        externalFiles = new File(environment.getExternalStorageDirectory(),
+                                 PACKAGE.replace(".", File.separator));
         Log.d(APP, "External files path: " + externalFiles);
+        File[] externalListing, internalListing;
+        internalListing = internalFiles.listFiles();
+        externalListing = externalFiles.listFiles();    
+        Log.d(APP, "external listing: " + externalListing);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

@@ -7,6 +7,25 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical|center_horizontal">
 
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_horizontal">
+
+      <Spinner
+        android:id="@+id/schools"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:spinnerMode="dropdown" />
+
+      <Spinner
+        android:id="@+id/years"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:spinnerMode="dropdown" />
+
+    </LinearLayout>
+
     <Chronometer
       android:id="@+id/chronometer"
       android:layout_centerHorizontal="true"
@@ -40,3 +59,6 @@
   </RelativeLayout>
 
 </RelativeLayout>
+<!--
+ vim: tabstop=8 expandtab shiftwidth=2 softtabstop=2
+ -->

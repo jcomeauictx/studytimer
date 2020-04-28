@@ -12,16 +12,30 @@
       android:layout_centerHorizontal="true"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
-   
-    <Button
-      android:id="@+id/start"
+
+    <LinearLayout
       android:layout_below="@id/chronometer"
-      android:layout_centerHorizontal="true"
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:onClick="nag"
-      android:text="Uninitialized"
-      tools:context=".MainActivity" />
+      android:gravity="center_horizontal">
+   
+      <Button
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="nag"
+        android:text="Uninitialized"
+        tools:context=".MainActivity" />
+
+      <Button
+        android:id="@+id/listen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Uninitialized"
+        tools:context=".MainActivity" />
+
+     </LinearLayout>
+
 
   </RelativeLayout>
 

@@ -42,6 +42,8 @@ public class MainActivity extends Activity {
     int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+    Button studyButton;
+    Button listenButton;
     String[] STUDY_BUTTON_TEXT = {"Stop", "Study"};
     String[] LISTEN_BUTTON_TEXT = {"Stop", "Listen"};
     AlarmManager alarmManager;
@@ -53,8 +55,6 @@ public class MainActivity extends Activity {
     long elapsed;
     String active;  // button currently active if any
     String version;
-    Button studyButton;
-    Button listenButton;
     Environment environment;
     File internalFiles;
     File externalFiles;
@@ -73,9 +73,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(APP, "onCreate starting");
         super.onCreate(savedInstanceState);
-        studyButton = (Button)findViewById(R.id.study);
-        listenButton = (Button)findViewById(R.id.listen);
-        Log.d(APP, "buttons: " + studyButton + ", " + listenButton);
         if (savedInstanceState == null) {
             elapsed = 0;
             active = null;
@@ -84,6 +81,9 @@ public class MainActivity extends Activity {
             active = savedInstanceState.getString("active", null);
         }
         setContentView(R.layout.activity_main);
+        studyButton = (Button)findViewById(R.id.study);
+        listenButton = (Button)findViewById(R.id.listen);
+        Log.d(APP, "buttons: " + studyButton + ", " + listenButton);
         chronometer = (Chronometer)findViewById(R.id.chronometer);
         try {
             PackageInfo packageInfo = this.getPackageManager()

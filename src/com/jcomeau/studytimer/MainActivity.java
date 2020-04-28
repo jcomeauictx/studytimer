@@ -131,15 +131,15 @@ public class MainActivity extends Activity {
         }
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
-        internalFiles = new File(appContext.getExternalFilesDir(null),
-                                 PACKAGE.replace(".", File.separator));
-        Log.d(APP, "Internal files path: " + internalFiles);
+        internalFiles = appContext.getExternalFilesDir(null);
+        Log.d(APP, "Internal files path: " + internalFiles + " is directory: " +
+              internalFiles.isDirectory());
         externalFiles = new File(environment.getExternalStorageDirectory(),
                                  PACKAGE.replace(".", File.separator));
-        Log.d(APP, "External files path: " + externalFiles);
-        File[] externalListing, internalListing;
-        internalListing = internalFiles.listFiles();
-        externalListing = externalFiles.listFiles();    
+        Log.d(APP, "External files path: " + externalFiles + " is directory: " +
+              externalFiles.isDirectory());
+        String[] externalListing, internalListing;
+        externalListing = externalFiles.list();    
         Log.d(APP, "external listing: " + externalListing);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {

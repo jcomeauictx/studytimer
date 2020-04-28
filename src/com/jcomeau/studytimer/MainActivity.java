@@ -53,6 +53,8 @@ public class MainActivity extends Activity {
     long elapsed;
     String active;  // button currently active if any
     String version;
+    Button studyButton;
+    Button listenButton;
     Environment environment;
     File internalFiles;
     File externalFiles;
@@ -71,8 +73,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(APP, "onCreate starting");
         super.onCreate(savedInstanceState);
-        Button studyButton = (Button)findViewById(R.id.study);
-        Button listenButton = (Button)findViewById(R.id.listen);
+        studyButton = (Button)findViewById(R.id.study);
+        listenButton = (Button)findViewById(R.id.listen);
         if (savedInstanceState == null) {
             elapsed = 0;
             active = null;

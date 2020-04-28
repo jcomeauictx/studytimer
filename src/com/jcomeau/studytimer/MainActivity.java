@@ -136,7 +136,7 @@ public class MainActivity extends Activity {
               externalFiles.canRead());
         String[] listing;
         listing = externalFiles.list();    
-        Log.d(APP, "external listing: " + listing);
+        Log.d(APP, "external listing: " + listing[0]);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

@@ -35,7 +35,7 @@ SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
 YEAR ?= 1
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
-STORAGE := $(SDCARD)/$(APPPATH)/$(SCHOOL)/$(YEAR)
+STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
 export
 all: rebuild reinstall
 rebuild: clean build

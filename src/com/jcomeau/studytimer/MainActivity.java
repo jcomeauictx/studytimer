@@ -56,7 +56,6 @@ public class MainActivity extends Activity {
     String active;  // button currently active if any
     String version;
     Environment environment;
-    File internalFiles;
     File externalFiles;
     File[] schools;
     File[] years;
@@ -131,16 +130,13 @@ public class MainActivity extends Activity {
         }
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
-        internalFiles = appContext.getExternalFilesDir(null);
-        Log.d(APP, "Internal files path: " + internalFiles + " is directory: " +
-              internalFiles.isDirectory());
-        externalFiles = new File(environment.getExternalStorageDirectory(),
-                                 PACKAGE.replace(".", File.separator));
-        Log.d(APP, "External files path: " + externalFiles + " is directory: " +
-              externalFiles.isDirectory());
-        String[] externalListing, internalListing;
-        externalListing = externalFiles.list();    
-        Log.d(APP, "external listing: " + externalListing);
+        externalFiles = appContext.getExternalFilesDir(null);
+        Log.d(APP, "Internal files path: " + externalFiles + " is directory: " +
+              externalFiles.isDirectory() + " is readable: " +
+              externalFiles.canRead());
+        String[] listing;
+        listing = externalFiles.list();    
+        Log.d(APP, "external listing: " + listing);
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

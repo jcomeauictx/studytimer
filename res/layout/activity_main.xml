@@ -20,7 +20,7 @@
       android:gravity="center_horizontal">
    
       <Button
-        android:id="@+id/start"
+        android:id="@+id/study"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="nag"
@@ -31,6 +31,7 @@
         android:id="@+id/listen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+	android:onClick="listen"
         android:text="Uninitialized"
         tools:context=".MainActivity" />
 

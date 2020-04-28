@@ -42,8 +42,8 @@ public class MainActivity extends Activity {
     int SCREEN_ON = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-    String[] BUTTON_TEXT = {"Stop", "Start"};
-    boolean STOPPED;
+    String[] STUDY_BUTTON_TEXT = {"Stop", "Study"};
+    String[] LISTEN_BUTTON_TEXT = {"Stop", "Listen"};
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context appContext;
@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
     TextToSpeech textToSpeech;
     Chronometer chronometer;
     long elapsed;
+    String active;  // button currently active if any
     String version;
     Environment environment;
     File internalFiles;
@@ -70,15 +71,16 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(APP, "onCreate starting");
         super.onCreate(savedInstanceState);
+        Button studyButton = (Button)findViewById(R.id.study);
+        Button listenButton = (Button)findViewById(R.id.listen);
         if (savedInstanceState == null) {
-            STOPPED = true;
             elapsed = 0;
+            active = null;
         } else {
-            STOPPED = savedInstanceState.getBoolean("STOPPED", true);
             elapsed = savedInstanceState.getLong("elapsed", 0);
+            active = savedInstanceState.getString("active", null);
         }
         setContentView(R.layout.activity_main);
-        Button button = (Button)findViewById(R.id.start);
         chronometer = (Chronometer)findViewById(R.id.chronometer);
         try {
             PackageInfo packageInfo = this.getPackageManager()
@@ -89,9 +91,16 @@ public class MainActivity extends Activity {
             version = "unknown";
         }
         Log.d(APP, "version: " + version);
-        Log.d(APP, "button: " + button);
-        Log.d(APP, "Setting button text to " + BUTTON_TEXT[STOPPED ? 1 : 0]);
-        button.setText(BUTTON_TEXT[STOPPED ? 1 : 0]);
+        if (active == "study") {
+            studyButton.setText(STUDY_BUTTON_TEXT[0]);
+            listenButton.setVisibility(View.GONE);
+        } else if (active == "listen") {
+            listenButton.setText(LISTEN_BUTTON_TEXT[0]);
+            studyButton.setVisibility(View.GONE);
+        } else {
+            studyButton.setText(STUDY_BUTTON_TEXT[1]);
+            listenButton.setText(LISTEN_BUTTON_TEXT[1]);
+        }
         appContext = getApplicationContext();
         intent = new Intent(ACTION);
         registerReceiver(alarmReceiver, new IntentFilter(ACTION));
@@ -110,7 +119,7 @@ public class MainActivity extends Activity {
         if (elapsed > 0) {
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
         }
-        if (!STOPPED) {
+        if (active != null) {
             Log.d(APP, "restarting chronometer");
             chronometer.start();
         }
@@ -143,8 +152,8 @@ public class MainActivity extends Activity {
         super.onSaveInstanceState(state);
         Log.d(APP, "saving instance state");
         elapsed = milliseconds(chronometer.getText().toString());
-        state.putBoolean("STOPPED", STOPPED);
         state.putLong("elapsed", elapsed);
+        state.putString("active", active);
     }
 
     public long milliseconds(String time) {
@@ -160,10 +169,13 @@ public class MainActivity extends Activity {
 
     public void nag(View view) {
         Button button = (Button)findViewById(view.getId());
+        Button other = (Button)findViewById(R.id.listen);
         Log.d(APP, "button " + button + " pushed");
-        if (STOPPED) {
+        if (active == null) {
+            active = "study";
+            other.setVisibility(View.GONE);
             Log.d(APP, "start nagging");
-            button.setText(BUTTON_TEXT[0]);
+            button.setText(STUDY_BUTTON_TEXT[0]);
             Log.d(APP, "scheduling intent: " + alarmIntent);
 	    alarmManager.setRepeating(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -173,13 +185,35 @@ public class MainActivity extends Activity {
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
         } else {
+            active = null;
+            other.setVisibility(View.VISIBLE);
             Log.d(APP, "stop nagging");
-            button.setText(BUTTON_TEXT[1]);
+            button.setText(STUDY_BUTTON_TEXT[1]);
             alarmManager.cancel(alarmIntent);
             chronometer.stop();
             elapsed = milliseconds(chronometer.getText().toString());
         }
-        STOPPED = !STOPPED;
+    }
+
+    public void listen(View view) {
+        Button button = (Button)findViewById(view.getId());
+        Button other = (Button)findViewById(R.id.study);
+        Log.d(APP, "button " + button + " pushed");
+        if (active == null) {
+            active = "listen";
+            other.setVisibility(View.GONE);
+            Log.d(APP, "start listening");
+            button.setText(LISTEN_BUTTON_TEXT[0]);
+            chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
+            chronometer.start();
+        } else {
+            active = null;
+            other.setVisibility(View.VISIBLE);
+            Log.d(APP, "stop listening");
+            button.setText(LISTEN_BUTTON_TEXT[1]);
+            chronometer.stop();
+            elapsed = milliseconds(chronometer.getText().toString());
+        }
     }
 }
 // vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

@@ -4,6 +4,7 @@ package com.jcomeau.studytimer;
 // and other samples on StackOverflow and elsewhere
 // NOTE: Android 19 does not support String.join()!
 import java.util.Locale;
+import java.util.Arrays;
 import android.util.Log;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -60,14 +61,12 @@ public class MainActivity extends Activity {
     String version;
     Environment environment;
     File externalFiles;
-    String[] schools;
-    String[] years;
-    String[] classes;
-    String[] media;
-    Spinner selectSchool;
-    Spinner selectYear;
-    Spinner selectClass;
+    String[] schools, years, classes, media;
+    Spinner selectSchool, selectYear, selectClass;
+    String schoolSelected, yearSelected, classSelected;
     MediaPlayer player;
+    int mediaIndex;
+    int mediaOffset;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -86,9 +85,13 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
             elapsed = 0;
             active = null;
+            mediaIndex = 0;
+            mediaOffset = 0;
         } else {
             elapsed = savedInstanceState.getLong("elapsed", 0);
             active = savedInstanceState.getString("active", null);
+            mediaIndex = savedInstanceState.getInt("mediaIndex", 0);
+            mediaOffset = savedInstanceState.getInt("mediaOffset", 0);
         }
         setContentView(R.layout.activity_main);
         studyButton = (Button)findViewById(R.id.study);
@@ -182,7 +185,7 @@ public class MainActivity extends Activity {
                 android.R.layout.simple_spinner_dropdown_item);
             selectClass.setAdapter(adapter);
             directory = new File(directory, classes[0]);
-            media = directory.list();
+            media = directory.list(); Arrays.sort(media);
             Log.d(APP, "found " + media.length + " files in " + directory);
         } catch (Exception failed) {
             Log.e(APP, "Populating spinners failed: " + failed);
@@ -214,6 +217,9 @@ public class MainActivity extends Activity {
         elapsed = milliseconds(chronometer.getText().toString());
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
+        state.putInt("mediaIndex", mediaIndex);
+        state.putInt("mediaOffset", player.isPlaying() ?
+                     player.getCurrentPosition() : mediaOffset);
     }
 
     public String join(String separator, String ...pieces) {
@@ -274,18 +280,21 @@ public class MainActivity extends Activity {
             other.setVisibility(View.GONE);
             Log.d(APP, "start listening");
             button.setText(LISTEN_BUTTON_TEXT[0]);
-            String path = join(File.separator,
-                externalFiles.toString(),
-                selectSchool.getSelectedItem().toString(),
-                selectYear.getSelectedItem().toString(),
-                selectClass.getSelectedItem().toString(),
-                media[0]);
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
             try {
+                String path = join(File.separator,
+                    externalFiles.toString(),
+                    selectSchool.getSelectedItem().toString(),
+                    selectYear.getSelectedItem().toString(),
+                    selectClass.getSelectedItem().toString(),
+                    media[mediaIndex]);
                 Log.d(APP, "setting path to " + path);
                 player.setDataSource(path);
                 player.prepare();
+                if (mediaOffset > 0) player.seekTo(mediaOffset);
+                Log.d(APP, "starting play of " + media[mediaIndex] +
+                      " at position " + mediaOffset);
                 player.start();
             } catch (Exception problem) {
                 Log.e(APP, "listen failed: " + problem);
@@ -299,6 +308,8 @@ public class MainActivity extends Activity {
             chronometer.stop();
             elapsed = milliseconds(chronometer.getText().toString());
             player.stop();
+            mediaOffset = player.getCurrentPosition();
+            Log.d(APP, "current position: " + mediaOffset);
         }
     }
 }

@@ -186,7 +186,6 @@ public class MainActivity extends Activity {
         } catch (Exception failed) {
             Log.e(APP, "Populating spinners failed: " + failed);
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
-            findViewById(R.id.classes).setVisibility(View.GONE);
         }
         player = new MediaPlayer();
         textToSpeech = new TextToSpeech(getApplicationContext(),

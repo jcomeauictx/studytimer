@@ -62,9 +62,11 @@ public class MainActivity extends Activity {
     String[] schools;
     String[] years;
     String[] classes;
+    String[] media;
     Spinner selectSchool;
     Spinner selectYear;
     Spinner selectClass;
+    MediaPlayer player;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -177,11 +179,14 @@ public class MainActivity extends Activity {
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
             selectClass.setAdapter(adapter);
+            directory = new File(directory, classes[0]);
+            media = directory.list();
         } catch (Exception failed) {
             Log.e(APP, "Populating spinners failed: " + failed);
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
             findViewById(R.id.classes).setVisibility(View.GONE);
         }
+        player = new MediaPlayer();
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override
@@ -257,6 +262,15 @@ public class MainActivity extends Activity {
             other.setVisibility(View.GONE);
             Log.d(APP, "start listening");
             button.setText(LISTEN_BUTTON_TEXT[0]);
+            String path = String.join(File.separator,
+                new String[] {externalFiles.toString(),
+                selectSchool.getSelectedItem().toString(),
+                selectYear.getSelectedItem().toString(),
+                selectClass.getSelectedItem().toString(),
+                media[0]});
+            player.setDataSource(path);
+            player.prepare();
+            player.start();
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
         } else {
@@ -266,6 +280,7 @@ public class MainActivity extends Activity {
             button.setText(LISTEN_BUTTON_TEXT[1]);
             chronometer.stop();
             elapsed = milliseconds(chronometer.getText().toString());
+            player.stop();
         }
     }
 }

@@ -142,8 +142,10 @@ public class MainActivity extends Activity {
                   " is directory: " + externalFiles.isDirectory() +
                   " is readable: " + externalFiles.canRead());
             schools = externalFiles.list();
-            Log.d(APP, "schools: " + schools);
-            if (schools == null) throw new Exception("no schools");
+            if (schools == null || schools.length == 0)
+                throw new Exception("no schools");
+            else
+                Log.d(APP, "schools: " + schools + ", first: " + schools[0]);
             ArrayAdapter<String> adapter = new ArrayAdapter(
                 this, android.R.layout.simple_spinner_item, schools);
             adapter.setDropDownViewResource(

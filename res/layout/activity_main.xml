@@ -1,18 +1,22 @@
+<!--Outermost layout includes the title box-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <RelativeLayout
+  <!--Next inner layout is vertical, centered horizontally and vertically-->
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_vertical|center_horizontal">
 
+    <!--Two dropdown boxes (spinners) side by side, school and year-->
     <LinearLayout
       android:id="@+id/schoolyear"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:orientation="horizontal"
       android:gravity="center_horizontal">
 
       <Spinner
@@ -31,7 +35,6 @@
 
     <Spinner
       android:id="@+id/classes"
-      android:layout_below="@id/schoolyear"
       android:layout_centerHorizontal="true"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -39,15 +42,15 @@
 
     <Chronometer
       android:id="@+id/chronometer"
-      android:layout_below="@id/classes"
       android:layout_centerHorizontal="true"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
 
+    <!--Two buttons side by side, Study and Listen-->
     <LinearLayout
-      android:layout_below="@id/chronometer"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:orientation="horizontal"
       android:gravity="center_horizontal">
    
       <Button
@@ -68,7 +71,7 @@
 
      </LinearLayout>
 
-  </RelativeLayout>
+  </LinearLayout>
 
 </RelativeLayout>
 <!--

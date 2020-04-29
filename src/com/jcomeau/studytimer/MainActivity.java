@@ -182,6 +182,7 @@ public class MainActivity extends Activity {
             selectClass.setAdapter(adapter);
             directory = new File(directory, classes[0]);
             media = directory.list();
+            Log.d(APP, "found " + media.length + " files in " + directory);
         } catch (Exception failed) {
             Log.e(APP, "Populating spinners failed: " + failed);
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
@@ -282,6 +283,7 @@ public class MainActivity extends Activity {
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
             try {
+                Log.d(APP, "setting path to " + path);
                 player.setDataSource(path);
                 player.prepare();
                 player.start();

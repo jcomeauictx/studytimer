@@ -2,6 +2,7 @@ package com.jcomeau.studytimer;
 // sample code from https://medium.com/@authmane512/
 // how-to-build-an-apk-from-command-line-without-ide-7260e1e22676
 // and other samples on StackOverflow and elsewhere
+// NOTE: Android 19 does not support String.join()!
 import java.util.Locale;
 import android.util.Log;
 import android.os.Bundle;
@@ -150,7 +151,7 @@ public class MainActivity extends Activity {
                 throw new Exception("no schools");
             else
                 Log.d(APP, "first school: " + schools[0]);
-            ArrayAdapter<String> adapter = new ArrayAdapter(
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, schools);
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
@@ -162,7 +163,7 @@ public class MainActivity extends Activity {
                 throw new Exception("no years");
             else
                 Log.d(APP, "first year: " + years[0]);
-            adapter = new ArrayAdapter(
+            adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, years);
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
@@ -174,7 +175,7 @@ public class MainActivity extends Activity {
                 throw new Exception("no classes");
             else
                 Log.d(APP, "first class: " + classes[0]);
-            adapter = new ArrayAdapter(
+            adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, classes);
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
@@ -212,6 +213,16 @@ public class MainActivity extends Activity {
         elapsed = milliseconds(chronometer.getText().toString());
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
+    }
+
+    public String join(String separator, String ...pieces) {
+        String joined = null;
+        if (pieces.length > 0) joined = "";
+        for (int i = 0; i < pieces.length; i++) {
+            joined += pieces[i];
+            if (i < pieces.length - 1) joined += separator;
+        }
+        return joined;
     }
 
     public long milliseconds(String time) {
@@ -262,17 +273,22 @@ public class MainActivity extends Activity {
             other.setVisibility(View.GONE);
             Log.d(APP, "start listening");
             button.setText(LISTEN_BUTTON_TEXT[0]);
-            String path = String.join(File.separator,
-                new String[] {externalFiles.toString(),
+            String path = join(File.separator,
+                externalFiles.toString(),
                 selectSchool.getSelectedItem().toString(),
                 selectYear.getSelectedItem().toString(),
                 selectClass.getSelectedItem().toString(),
-                media[0]});
-            player.setDataSource(path);
-            player.prepare();
-            player.start();
+                media[0]);
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
+            try {
+                player.setDataSource(path);
+                player.prepare();
+                player.start();
+            } catch (Exception problem) {
+                Log.e(APP, "listen failed: " + problem);
+                listen(view);  // stop the clock if there was an error
+            }
         } else {
             active = null;
             other.setVisibility(View.VISIBLE);

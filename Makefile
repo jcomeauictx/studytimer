@@ -49,6 +49,9 @@ src/$(APPPATH)/R.java: $(RESOURCES)
 	 -M $(MANIFEST) \
 	 -S res \
 	 -I $(ANDROID)
+# must use older javac, otherwise error:
+# com.android.dx.cf.iface.ParseException: bad class file magic (cafebabe)
+# or version (0034.0000)
 $(CLASSES): $(SOURCES)
 	javac -d obj \
 	 -source 1.6 \

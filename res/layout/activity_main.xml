@@ -9,11 +9,10 @@
     android:orientation="vertical"
     android:gravity="center_vertical|center_horizontal">
 
-    <RelativeLayout
+    <LinearLayout
       android:id="@+id/schoolyear"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="horizontal"
       android:gravity="center_horizontal">
 
       <Spinner
@@ -24,12 +23,11 @@
 
       <Spinner
         android:id="@+id/years"
-        android:layout_toRightOf="@id/schools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <Spinner
       android:id="@+id/classes"

@@ -22,6 +22,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.media.MediaPlayer;
 import android.speech.tts.TextToSpeech;
 import java.io.File;
@@ -57,9 +59,12 @@ public class MainActivity extends Activity {
     String version;
     Environment environment;
     File externalFiles;
-    File[] schools;
-    File[] years;
-    File[] classes;
+    String[] schools;
+    String[] years;
+    String[] classes;
+    Spinner selectSchool;
+    Spinner selectYear;
+    Spinner selectClass;
     BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -130,13 +135,25 @@ public class MainActivity extends Activity {
         }
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
-        externalFiles = appContext.getExternalFilesDir(null);
-        Log.d(APP, "Internal files path: " + externalFiles + " is directory: " +
-              externalFiles.isDirectory() + " is readable: " +
-              externalFiles.canRead());
-        String[] listing;
-        listing = externalFiles.list();    
-        Log.d(APP, "external listing: " + listing[0]);
+        try {
+            Spinner selectSchool = (Spinner)findViewById(R.id.schools);
+            externalFiles = appContext.getExternalFilesDir(null);
+            Log.d(APP, "Internal files path: " + externalFiles +
+                  " is directory: " + externalFiles.isDirectory() +
+                  " is readable: " + externalFiles.canRead());
+            schools = externalFiles.list();
+            Log.d(APP, "schools: " + schools);
+            if (schools == null) throw new Exception("no schools");
+            ArrayAdapter<String> adapter = new ArrayAdapter(
+                this, android.R.layout.simple_spinner_item, schools);
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+            selectSchool.setAdapter(adapter);
+        } catch (Exception failed) {
+            Log.e(APP, "Populating spinners failed: " + failed);
+            findViewById(R.id.schoolyear).setVisibility(View.GONE);
+            findViewById(R.id.classes).setVisibility(View.GONE);
+        }
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override

@@ -8,6 +8,7 @@
     android:gravity="center_vertical|center_horizontal">
 
     <LinearLayout
+      android:id="@+id/schoolyear"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:gravity="center_horizontal">
@@ -26,8 +27,16 @@
 
     </LinearLayout>
 
+    <Spinner
+      android:id="@+id/classes"
+      android:layout_below="@id/schoolyear"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:spinnerMode="dropdown" />
+
     <Chronometer
       android:id="@+id/chronometer"
+      android:layout_below="@id/classes"
       android:layout_centerHorizontal="true"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />

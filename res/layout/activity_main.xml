@@ -39,17 +39,43 @@
 
       </LinearLayout>
 
-      <Spinner
-        android:id="@+id/years"
-        android:layout_width="wrap_content"
+      <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:spinnerMode="dropdown" />
+        android:orientation="horizontal">
 
-      <Spinner
-        android:id="@+id/classes"
-        android:layout_width="wrap_content"
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:gravity="left"
+          android:text="Year:" />
+
+        <Spinner
+          android:id="@+id/years"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:spinnerMode="dropdown" />
+
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:spinnerMode="dropdown" />
+        android:orientation="horizontal">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:gravity="left"
+          android:text="Class:" />
+
+        <Spinner
+          android:id="@+id/classes"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:spinnerMode="dropdown" />
+
+      </LinearLayout>
 
     </LinearLayout>
 

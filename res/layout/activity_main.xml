@@ -1,16 +1,19 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
   <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:gravity="center_vertical|center_horizontal">
 
-    <LinearLayout
+    <RelativeLayout
       android:id="@+id/schoolyear"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:orientation="horizontal"
       android:gravity="center_horizontal">
 
       <Spinner
@@ -26,7 +29,7 @@
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <Spinner
       android:id="@+id/classes"

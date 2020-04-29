@@ -141,6 +141,7 @@ public class MainActivity extends Activity {
         try {
             externalFiles = appContext.getExternalFilesDir(null);
             File directory;
+            ArrayAdapter<String> adapter;
             selectSchool = (Spinner)findViewById(R.id.schools);
             directory = externalFiles;
             Log.d(APP, "Internal files path: " + directory +
@@ -151,12 +152,12 @@ public class MainActivity extends Activity {
                 throw new Exception("no schools");
             else
                 Log.d(APP, "first school: " + schools[0]);
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_spinner_item, schools);
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
             selectSchool.setAdapter(adapter);
-            selectYear = (Spinner)findViewById(R.id.schools);
+            selectYear = (Spinner)findViewById(R.id.years);
             directory = new File(directory, schools[0]);
             years = directory.list();
             if (years == null || years.length == 0)

@@ -54,6 +54,7 @@
           android:id="@+id/years"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:gravity="right"
           android:spinnerMode="dropdown" />
 
       </LinearLayout>
@@ -73,6 +74,7 @@
           android:id="@+id/classes"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:gravity="right"
           android:spinnerMode="dropdown" />
 
       </LinearLayout>

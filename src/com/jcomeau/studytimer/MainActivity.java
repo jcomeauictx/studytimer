@@ -136,21 +136,47 @@ public class MainActivity extends Activity {
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
         try {
-            Spinner selectSchool = (Spinner)findViewById(R.id.schools);
             externalFiles = appContext.getExternalFilesDir(null);
-            Log.d(APP, "Internal files path: " + externalFiles +
-                  " is directory: " + externalFiles.isDirectory() +
-                  " is readable: " + externalFiles.canRead());
-            schools = externalFiles.list();
+            File directory;
+            selectSchool = (Spinner)findViewById(R.id.schools);
+            directory = externalFiles;
+            Log.d(APP, "Internal files path: " + directory +
+                  " is directory: " + directory.isDirectory() +
+                  " is readable: " + directory.canRead());
+            schools = directory.list();
             if (schools == null || schools.length == 0)
                 throw new Exception("no schools");
             else
-                Log.d(APP, "schools: " + schools + ", first: " + schools[0]);
+                Log.d(APP, "first school: " + schools[0]);
             ArrayAdapter<String> adapter = new ArrayAdapter(
                 this, android.R.layout.simple_spinner_item, schools);
             adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
             selectSchool.setAdapter(adapter);
+            selectYear = (Spinner)findViewById(R.id.schools);
+            directory = new File(directory, schools[0]);
+            years = directory.list();
+            if (years == null || years.length == 0)
+                throw new Exception("no years");
+            else
+                Log.d(APP, "first year: " + years[0]);
+            adapter = new ArrayAdapter(
+                this, android.R.layout.simple_spinner_item, years);
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+            selectYear.setAdapter(adapter);
+            selectClass = (Spinner)findViewById(R.id.classes);
+            directory = new File(directory, years[0]);
+            classes = directory.list();
+            if (classes == null || classes.length == 0)
+                throw new Exception("no classes");
+            else
+                Log.d(APP, "first class: " + classes[0]);
+            adapter = new ArrayAdapter(
+                this, android.R.layout.simple_spinner_item, classes);
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+            selectClass.setAdapter(adapter);
         } catch (Exception failed) {
             Log.e(APP, "Populating spinners failed: " + failed);
             findViewById(R.id.schoolyear).setVisibility(View.GONE);

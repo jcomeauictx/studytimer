@@ -219,7 +219,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(alarmReceiver);
-        if (player.isPlaying()) player.stop();
+        if (player.isPlaying()) {
+            player.stop();
+            player.reset();
+            player.release();
+        }
         super.onDestroy();
     }
 
@@ -326,6 +330,8 @@ public class MainActivity extends Activity {
             elapsed = milliseconds(chronometer.getText().toString());
             player.stop();
             mediaOffset = player.getCurrentPosition();
+            player.reset();
+            player.release();
             Log.d(APP, "current position: " + mediaOffset);
         }
     }

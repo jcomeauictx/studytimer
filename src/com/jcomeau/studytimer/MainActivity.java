@@ -223,6 +223,7 @@ public class MainActivity extends Activity {
             player.stop();
             player.reset();
             player.release();
+            player = null;
         }
         super.onDestroy();
     }
@@ -296,6 +297,7 @@ public class MainActivity extends Activity {
             selectClass.getSelectedItem().toString(),
             media[mediaIndex]);
         Log.d(APP, "setting path to " + path);
+        // the following can throw a java.lang.IllegalStateException
         player.setDataSource(path);
         player.prepare();
         if (mediaOffset > 0) player.seekTo(mediaOffset);
@@ -330,9 +332,10 @@ public class MainActivity extends Activity {
             elapsed = milliseconds(chronometer.getText().toString());
             player.stop();
             mediaOffset = player.getCurrentPosition();
+            Log.d(APP, "current position: " + mediaOffset);
             player.reset();
             player.release();
-            Log.d(APP, "current position: " + mediaOffset);
+            player = null;
         }
     }
 }

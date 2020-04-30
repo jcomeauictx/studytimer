@@ -110,9 +110,11 @@ public class MainActivity extends Activity {
         Log.d(APP, "version: " + version);
         if (active == "study") {
             studyButton.setText(STUDY_BUTTON_TEXT[0]);
+            listenButton.setText(LISTEN_BUTTON_TEXT[1]);
             listenButton.setVisibility(View.GONE);
         } else if (active == "listen") {
             listenButton.setText(LISTEN_BUTTON_TEXT[0]);
+            studyButton.setText(STUDY_BUTTON_TEXT[1]);
             studyButton.setVisibility(View.GONE);
         } else {
             studyButton.setText(STUDY_BUTTON_TEXT[1]);
@@ -196,7 +198,7 @@ public class MainActivity extends Activity {
         if (active == "listen") {
             try {
                 play();
-            } catch (IOException problem) {
+            } catch (Exception problem) {
                 Log.e(APP, "listen on recreate failed: " + problem);
                 // stop the clock if there was an error
                 listen(findViewById(R.id.listen));
@@ -311,7 +313,7 @@ public class MainActivity extends Activity {
             chronometer.start();
             try {
                 play();
-            } catch (IOException problem) {
+            } catch (Exception problem) {
                 Log.e(APP, "listen failed: " + problem);
                 listen(view);  // stop the clock if there was an error
             }

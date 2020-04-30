@@ -5,6 +5,7 @@ package com.jcomeau.studytimer;
 // NOTE: Android 19 does not support String.join()!
 import java.util.Locale;
 import java.util.Arrays;
+import java.io.IOException;
 import android.util.Log;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -192,6 +193,15 @@ public class MainActivity extends Activity {
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
         }
         player = new MediaPlayer();
+        if (active == "listen") {
+            try {
+                play();
+            } catch (IOException problem) {
+                Log.e(APP, "listen on recreate failed: " + problem);
+                // stop the clock if there was an error
+                listen(findViewById(R.id.listen));
+            }
+        }
         textToSpeech = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
             @Override
@@ -207,6 +217,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(alarmReceiver);
+        if (player.isPlaying()) player.stop();
         super.onDestroy();
     }
 
@@ -271,6 +282,22 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void play() throws IOException {
+        String path = join(File.separator,
+            externalFiles.toString(),
+            selectSchool.getSelectedItem().toString(),
+            selectYear.getSelectedItem().toString(),
+            selectClass.getSelectedItem().toString(),
+            media[mediaIndex]);
+        Log.d(APP, "setting path to " + path);
+        player.setDataSource(path);
+        player.prepare();
+        if (mediaOffset > 0) player.seekTo(mediaOffset);
+        Log.d(APP, "starting play of " + media[mediaIndex] +
+              " at position " + mediaOffset);
+        player.start();
+    }
+
     public void listen(View view) {
         Button button = (Button)findViewById(view.getId());
         Button other = (Button)findViewById(R.id.study);
@@ -283,20 +310,8 @@ public class MainActivity extends Activity {
             chronometer.setBase(SystemClock.elapsedRealtime() - elapsed);
             chronometer.start();
             try {
-                String path = join(File.separator,
-                    externalFiles.toString(),
-                    selectSchool.getSelectedItem().toString(),
-                    selectYear.getSelectedItem().toString(),
-                    selectClass.getSelectedItem().toString(),
-                    media[mediaIndex]);
-                Log.d(APP, "setting path to " + path);
-                player.setDataSource(path);
-                player.prepare();
-                if (mediaOffset > 0) player.seekTo(mediaOffset);
-                Log.d(APP, "starting play of " + media[mediaIndex] +
-                      " at position " + mediaOffset);
-                player.start();
-            } catch (Exception problem) {
+                play();
+            } catch (IOException problem) {
                 Log.e(APP, "listen failed: " + problem);
                 listen(view);  // stop the clock if there was an error
             }

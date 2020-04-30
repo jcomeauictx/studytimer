@@ -219,12 +219,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(alarmReceiver);
-        if (player.isPlaying()) {
-            player.stop();
-            player.reset();
-            player.release();
-            player = null;
-        }
         super.onDestroy();
     }
 
@@ -236,8 +230,15 @@ public class MainActivity extends Activity {
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
         state.putInt("mediaIndex", mediaIndex);
-        state.putInt("mediaOffset", player.isPlaying() ?
-                     player.getCurrentPosition() : mediaOffset);
+        if (player.isPlaying()) {
+            state.putInt("mediaOffset", player.getCurrentPosition());
+            player.stop();
+            player.reset();
+            player.release();
+            player = null;
+        } else {
+            state.putInt("mediaOffset", mediaOffset);
+        }
     }
 
     public String join(String separator, String ...pieces) {

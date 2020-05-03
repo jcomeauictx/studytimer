@@ -232,12 +232,11 @@ public class MainActivity extends Activity {
         state.putInt("mediaIndex", mediaIndex);
         if (player != null && player.isPlaying()) {
             Log.d(APP, "Saving current position of " + player);
-            state.putInt("mediaOffset", player.getCurrentPosition());
-            Log.d(APP, "Stopping, resetting, releasing player");
-            player.stop();
-            player.reset();
-            player.release();
-            Log.d(APP, "Player relased");
+            try {
+                state.putInt("mediaOffset", player.getCurrentPosition());
+            } catch (java.lang.IllegalStateException error) {
+                Log.e(APP, "Cannot save player position: " + error);
+            }
         } else {
             state.putInt("mediaOffset", mediaOffset);
         }
@@ -299,14 +298,19 @@ public class MainActivity extends Activity {
             selectYear.getSelectedItem().toString(),
             selectClass.getSelectedItem().toString(),
             media[mediaIndex]);
-        Log.d(APP, "Setting path of player " + player + " to " + path);
         // the following can throw a java.lang.IllegalStateException
         try {
+            Log.d(APP, "Setting path of player " + player + " to " + path);
             player.setDataSource(path);
         } catch (java.lang.IllegalStateException error) {
-            Log.e(APP, "Ignoring " + error);
+            Log.e(APP, "Ignoring set path: " + error);
         }
-        player.prepare();
+        try {
+            Log.d(APP, "Preparing player");
+            player.prepare();
+        } catch (java.lang.IllegalStateException error) {
+            Log.e(APP, "Ignoring prepare: " + error);
+        }
         if (mediaOffset > 0) player.seekTo(mediaOffset);
         Log.d(APP, "Starting play of " + media[mediaIndex] +
               " at position " + mediaOffset);
@@ -337,11 +341,9 @@ public class MainActivity extends Activity {
             button.setText(LISTEN_BUTTON_TEXT[1]);
             chronometer.stop();
             elapsed = milliseconds(chronometer.getText().toString());
-            player.stop();
+            player.pause();
             mediaOffset = player.getCurrentPosition();
             Log.d(APP, "current position: " + mediaOffset);
-            player.reset();
-            player.release();
         }
     }
 }

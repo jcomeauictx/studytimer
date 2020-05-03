@@ -342,7 +342,6 @@ public class MainActivity extends Activity {
             Log.d(APP, "current position: " + mediaOffset);
             player.reset();
             player.release();
-            player = null;
         }
     }
 }

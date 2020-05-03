@@ -230,8 +230,10 @@ public class MainActivity extends Activity {
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
         state.putInt("mediaIndex", mediaIndex);
-        if (player.isPlaying()) {
+        if (player != null && player.isPlaying()) {
+            Log.d(APP, "Saving current position of " + player);
             state.putInt("mediaOffset", player.getCurrentPosition());
+            Log.d(APP, "Stopping, resetting, releasing player");
             player.stop();
             player.reset();
             player.release();

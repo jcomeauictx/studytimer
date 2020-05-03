@@ -64,7 +64,6 @@ public class MainActivity extends Activity {
     File externalFiles;
     String[] schools, years, classes, media;
     Spinner selectSchool, selectYear, selectClass;
-    String schoolSelected, yearSelected, classSelected;
     MediaPlayer player;
     int mediaIndex;
     int mediaOffset;
@@ -198,8 +197,9 @@ public class MainActivity extends Activity {
         if (active == "listen") {
             try {
                 play();
+                Log.d(APP, "Restarting play where left off.");
             } catch (Exception problem) {
-                Log.e(APP, "listen on recreate failed: " + problem);
+                Log.e(APP, "Listen on recreate failed: " + problem);
                 // stop the clock if there was an error
                 listen(findViewById(R.id.listen));
             }
@@ -225,7 +225,7 @@ public class MainActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        Log.d(APP, "saving instance state");
+        Log.d(APP, "Saving instance state");
         elapsed = milliseconds(chronometer.getText().toString());
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
@@ -235,7 +235,7 @@ public class MainActivity extends Activity {
             player.stop();
             player.reset();
             player.release();
-            player = null;
+            Log.d(APP, "Player relased");
         } else {
             state.putInt("mediaOffset", mediaOffset);
         }
@@ -297,12 +297,16 @@ public class MainActivity extends Activity {
             selectYear.getSelectedItem().toString(),
             selectClass.getSelectedItem().toString(),
             media[mediaIndex]);
-        Log.d(APP, "setting path to " + path);
+        Log.d(APP, "Setting path of player " + player + " to " + path);
         // the following can throw a java.lang.IllegalStateException
-        player.setDataSource(path);
+        try {
+            player.setDataSource(path);
+        } catch (java.lang.IllegalStateException error) {
+            Log.e(APP, "Ignoring " + error);
+        }
         player.prepare();
         if (mediaOffset > 0) player.seekTo(mediaOffset);
-        Log.d(APP, "starting play of " + media[mediaIndex] +
+        Log.d(APP, "Starting play of " + media[mediaIndex] +
               " at position " + mediaOffset);
         player.start();
     }

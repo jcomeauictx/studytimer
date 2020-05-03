@@ -136,3 +136,7 @@ copyaudio:
 	 adb shell mkdir -m 777 -p "$(STORAGE)"; \
 	 adb push "$$directory" "$(STORAGE)"/"$$(basename "$$directory")"; \
 	done
+/tmp/$(APPNAME).log: .FORCE
+	timeout 5m adb logcat | grep $(APPNAME) > $@ &
+log: /tmp/$(APPNAME).log
+

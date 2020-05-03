@@ -219,6 +219,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(alarmReceiver);
+        try {
+            player.stop();
+        } catch (java.lang.IllegalStateException ignored) {
+            Log.d(APP, "No need to stop player");
+        }
         super.onDestroy();
     }
 

@@ -20,15 +20,7 @@ DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
 DEBUG ?= #--debug-mode
 VERSION := git-$(shell git describe --always 2>/dev/null)
-#/home/jcomeau/Downloads/3rd Year Clancey's Outlaws MP3
-#/home/jcomeau/Downloads/3rd Year Clancey's Outlaws PDF
-#/home/jcomeau/Downloads/4th Year Clancey's Outlaws MP3
-#/home/jcomeau/Downloads/4th Year Clancey's Outlaws PDF
-#/home/jcomeau/Downloads/1st Year Clancey's Outlaws MP3
-#/home/jcomeau/Downloads/1st Year Clancey's Outlaws PDF
-#/home/jcomeau/Downloads/2nd Year Clancey's Outlaws MP3
-#/home/jcomeau/Downloads/2nd Year Clancey's Outlaws PDF
-# USBKEY is mount point of NWCUlaw.edu USB key, or to where it was copied
+# USBKEY is mount point of nwculaw.edu USB key, or to where it was copied
 USBKEY ?= $(HOME)/Downloads
 # SDCARD is your phone's external data directory (even if really internal)
 SDCARD ?= /sdcard

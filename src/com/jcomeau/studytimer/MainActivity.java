@@ -28,10 +28,11 @@ import android.widget.Chronometer;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.speech.tts.TextToSpeech;
 import java.io.File;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnCompletionListener {
     String APP = "studytimer";
     String PACKAGE = "com.jcomeau." + APP;
     String ACTION = PACKAGE + ".NAG";
@@ -296,30 +297,41 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void play() throws IOException {
-        String path = join(File.separator,
-            externalFiles.toString(),
-            selectSchool.getSelectedItem().toString(),
-            selectYear.getSelectedItem().toString(),
-            selectClass.getSelectedItem().toString(),
-            media[mediaIndex]);
-        // the following can throw a java.lang.IllegalStateException
+    public void play() {
         try {
+            String path = join(File.separator,
+                externalFiles.toString(),
+                selectSchool.getSelectedItem().toString(),
+                selectYear.getSelectedItem().toString(),
+                selectClass.getSelectedItem().toString(),
+                media[mediaIndex]);
             Log.d(APP, "Setting path of player " + player + " to " + path);
             player.setDataSource(path);
-        } catch (java.lang.IllegalStateException error) {
-            Log.e(APP, "Ignoring set path: " + error);
-        }
-        try {
             Log.d(APP, "Preparing player");
             player.prepare();
-        } catch (java.lang.IllegalStateException error) {
-            Log.e(APP, "Ignoring prepare: " + error);
+            if (mediaOffset > 0) player.seekTo(mediaOffset);
+            Log.d(APP, "Starting play of " + media[mediaIndex] +
+                  " at position " + mediaOffset);
+            player.start();
+        } catch (IllegalStateException | IOException error) {
+            Log.e(APP, "Failed to play media: " + error);
         }
-        if (mediaOffset > 0) player.seekTo(mediaOffset);
-        Log.d(APP, "Starting play of " + media[mediaIndex] +
-              " at position " + mediaOffset);
-        player.start();
+    }
+
+    public void onCompletion(MediaPlayer player) {
+        player.stop();
+        player.reset();
+        if (mediaIndex < media.length) {
+            mediaOffset = 0;
+            mediaIndex += 1;
+            play();
+        } else {
+            textToSpeech.speak(
+                "End of media content for the course " +
+                    selectClass.getSelectedItem().toString(),
+                TextToSpeech.QUEUE_FLUSH,
+                null);
+        }
     }
 
     public void listen(View view) {
@@ -346,9 +358,10 @@ public class MainActivity extends Activity {
             button.setText(LISTEN_BUTTON_TEXT[1]);
             chronometer.stop();
             elapsed = milliseconds(chronometer.getText().toString());
-            player.pause();
+            player.stop();
             mediaOffset = player.getCurrentPosition();
             Log.d(APP, "current position: " + mediaOffset);
+            player.reset();  // idle state needed for setDataSource()
         }
     }
 }

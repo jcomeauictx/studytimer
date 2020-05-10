@@ -195,6 +195,7 @@ public class MainActivity extends Activity implements OnCompletionListener {
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
         }
         player = new MediaPlayer();
+        player.setOnCompletionListener(this);
         if (active == "listen") {
             try {
                 play();
@@ -319,6 +320,7 @@ public class MainActivity extends Activity implements OnCompletionListener {
     }
 
     public void onCompletion(MediaPlayer player) {
+        Log.d(APP, "Play of audio file completed");
         player.stop();
         player.reset();
         if (mediaIndex < media.length) {

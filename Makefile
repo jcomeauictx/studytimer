@@ -35,7 +35,7 @@ SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
 YEAR ?= 1
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
-FIRSTAUDIO := $(shell find "$(AUDIO)"/ -type d | sed -n 2p)
+FIRSTAUDIO := $(notdir $(shell cd "$(AUDIO)" && find . -type d | sed -n 2p))
 STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
 export
 all: rebuild reinstall copyaudio
@@ -131,9 +131,9 @@ exportkey: $(HOME)/etc/ssl
 	 -alias $(APPNAME) \
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
 copyaudio:
-	@echo Copying mp3 files from "$(FIRSTAUDIO)" to device
+	@echo Copying mp3 files from "$(AUDIO)/$(FIRSTAUDIO)" to device
 	adb shell mkdir -m 777 -p "$(STORAGE)"
-	adb push "$(FIRSTAUDIO)" "$(STORAGE)"/"$(notdir $(FIRSTAUDIO))"
+	adb push "$(AUDIO)"/"$(FIRSTAUDIO)" "$(STORAGE)"/"$(FIRSTAUDIO)"
 allaudio:
 	@echo Copying mp3 files from USB key to device
 	for directory in "$(AUDIO)"/*; do \

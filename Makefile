@@ -136,4 +136,5 @@ allaudio:
 /tmp/$(APPNAME).log: .FORCE
 	timeout 2m adb logcat | grep $(APPNAME) > $@ &
 log: /tmp/$(APPNAME).log
-
+logcat:
+	adb $@ | sed -n '/BufferQueueProducer/n; /$(APPNAME)/p'

@@ -27,7 +27,7 @@ SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
 YEAR ?= 1
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
-FIRSTAUDIO := $(notdir $(shell cd "$(AUDIO)" && find . -type d | sed -n 2p))
+FIRSTAUDIO ?= $(notdir $(shell cd "$(AUDIO)" && find . -type d | sed -n 2p))
 SINGLEAUDIO := $(notdir $(shell cd "$(AUDIO)"/"$(FIRSTAUDIO)" && ls 02*))
 STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
 export
@@ -144,3 +144,5 @@ allaudio:
 log: /tmp/$(APPNAME).log
 logcat:
 	adb $@ | sed -n '/BufferQueueProducer/n; /$(APPNAME)/p'
+classes:
+	ls "$(AUDIO)"

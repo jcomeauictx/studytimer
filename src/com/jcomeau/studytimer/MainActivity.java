@@ -326,7 +326,7 @@ public class MainActivity extends Activity implements OnCompletionListener {
 
     public void onCompletion(MediaPlayer player) {
         Log.d(APP, "Play of audio file completed");
-        mediaOffset = 0;
+        player.seekTo(0);
         if (mediaIndex < media.length - 1) {
             player.stop();
             player.reset();

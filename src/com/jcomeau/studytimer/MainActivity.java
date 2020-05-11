@@ -321,9 +321,9 @@ public class MainActivity extends Activity implements OnCompletionListener {
 
     public void onCompletion(MediaPlayer player) {
         Log.d(APP, "Play of audio file completed");
-        player.stop();
-        player.reset();
-        if (mediaIndex < media.length) {
+        if (mediaIndex < media.length - 1) {
+            player.stop();
+            player.reset();
             mediaOffset = 0;
             mediaIndex += 1;
             play();
@@ -333,6 +333,7 @@ public class MainActivity extends Activity implements OnCompletionListener {
                     selectClass.getSelectedItem().toString(),
                 TextToSpeech.QUEUE_FLUSH,
                 null);
+            listen(findViewById(R.id.listen)); // toggle state back to idle
         }
     }
 

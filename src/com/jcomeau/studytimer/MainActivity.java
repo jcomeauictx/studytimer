@@ -226,6 +226,11 @@ public class MainActivity extends Activity implements OnCompletionListener {
         } catch (java.lang.IllegalStateException ignored) {
             Log.d(APP, "No need to stop player");
         }
+        try {
+            player.reset();
+        } catch (java.lang.IllegalStateException ignored) {
+            Log.d(APP, "No need to reset player");
+        }
         super.onDestroy();
     }
 
@@ -321,16 +326,17 @@ public class MainActivity extends Activity implements OnCompletionListener {
 
     public void onCompletion(MediaPlayer player) {
         Log.d(APP, "Play of audio file completed");
+        mediaOffset = 0;
         if (mediaIndex < media.length - 1) {
             player.stop();
             player.reset();
-            mediaOffset = 0;
             mediaIndex += 1;
             play();
         } else {
+            mediaIndex = 0;  // next time start from the beginning
             textToSpeech.speak(
-                "End of media content for the course " +
-                    selectClass.getSelectedItem().toString(),
+                "End of audio content for the " +
+                    selectClass.getSelectedItem().toString() + " class.",
                 TextToSpeech.QUEUE_FLUSH,
                 null);
             listen(findViewById(R.id.listen)); // toggle state back to idle

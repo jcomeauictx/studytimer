@@ -58,7 +58,7 @@ $(CLASSES): $(SOURCES)
 	 -bootclasspath $(ANDROID) \
 	 $+
 bin/classes.dex: $(CLASSES)
-	strace -f -o/tmp/dx.log $(TOOLS)/dx \
+	/bin/bash -x $(TOOLS)/dx \
 	 --dex \
 	 --output=$@ \
 	 obj

@@ -5,7 +5,9 @@ MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
-PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
+# MUST use java 7 with this version of Android tools!
+#PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
+PATH := /usr/local/src/jdk1.7.0_80/bin:$(TOOLS):$(PATH)
 R := src/$(APPPATH)/R.java
 SOURCES = $(wildcard src/$(APPPATH)/*.java)
 CLASSES = $(subst .java,.class,$(subst src/,obj/,$(SOURCES)))
@@ -26,6 +28,8 @@ USBKEY ?= $(HOME)/Downloads
 SDCARD ?= /sdcard
 SCHOOL ?= nwculaw.edu
 YEAR ?= 1
+DEVICE ?=  # make DEVICE="-t1" to specify device (adb devices -l to list)
+ADB := adb $(DEVICE)
 AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
 FIRSTAUDIO ?= $(notdir $(shell cd "$(AUDIO)" && find . -type d | sed -n 2p))
 SINGLEAUDIO := $(notdir $(shell cd "$(AUDIO)"/"$(FIRSTAUDIO)" && ls 02*))
@@ -101,16 +105,16 @@ $(APK): $(APK:.apk=.signed.apk)
 tools:
 	ls $(TOOLS)
 install:
-	adb install $(APK)
+	$(ADB) install $(APK)
 uninstall:
-	adb uninstall $(PACKAGE)
+	$(ADB) uninstall $(PACKAGE)
 reinstall: uninstall install
 test:
-	adb shell am start -n $(PACKAGE)/.MainActivity
+	$(ADB) shell am start -n $(PACKAGE)/.MainActivity
 src/$(APPPATH) $(DIRS) $(HOME)/etc/ssl:
 	mkdir -p $@
 mp3find:
-	adb shell 'find / -name "*.mp3" 2>/dev/null'
+	$(ADB) shell 'find / -name "*.mp3" 2>/dev/null'
 studytimer: .FORCE
 	[ -d $@ ] && mv -f $@ /tmp/$@.$(TIMESTAMP) || true
 	apktool d bin/studytimer.apk
@@ -125,24 +129,24 @@ exportkey: $(HOME)/etc/ssl
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device
-	adb shell mkdir -m 777 -p "$(STORAGE)"
-	adb push "$(AUDIO)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)" \
+	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"
+	$(ADB) push "$(AUDIO)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)" \
 		"$(STORAGE)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)"
 copyaudio:
 	@echo Copying mp3 files from "$(AUDIO)/$(FIRSTAUDIO)" to device
-	adb shell mkdir -m 777 -p "$(STORAGE)"
-	adb push "$(AUDIO)"/"$(FIRSTAUDIO)" "$(STORAGE)"/"$(FIRSTAUDIO)"
+	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"
+	$(ADB) push "$(AUDIO)"/"$(FIRSTAUDIO)" "$(STORAGE)"/"$(FIRSTAUDIO)"
 allaudio:
 	@echo Copying mp3 files from USB key to device
 	for directory in "$(AUDIO)"/*; do \
 	 echo Copying audio from "$$directory" to phone; \
-	 adb shell mkdir -m 777 -p "$(STORAGE)"; \
-	 adb push "$$directory" "$(STORAGE)"/"$$(basename "$$directory")"; \
+	 $(ADB) shell mkdir -m 777 -p "$(STORAGE)"; \
+	 $(ADB) push "$$directory" "$(STORAGE)"/"$$(basename "$$directory")"; \
 	done
 /tmp/$(APPNAME).log: .FORCE
-	timeout 2m adb logcat | grep $(APPNAME) > $@ &
+	timeout 2m $(ADB) logcat | grep $(APPNAME) > $@ &
 log: /tmp/$(APPNAME).log
 logcat:
-	adb $@ | sed -n '/BufferQueueProducer/n; /$(APPNAME)/p'
+	$(ADB) $@ | sed -n '/BufferQueueProducer/n; /$(APPNAME)/p'
 classes:
 	ls "$(AUDIO)"

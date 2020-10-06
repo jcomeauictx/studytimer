@@ -27,12 +27,15 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.speech.tts.TextToSpeech;
 import java.io.File;
 
-public class MainActivity extends Activity implements OnCompletionListener {
+public class MainActivity extends Activity implements OnCompletionListener,
+        OnItemSelectedListener {
     String APP = "studytimer";
     String PACKAGE = "com.jcomeau." + APP;
     String ACTION = PACKAGE + ".NAG";
@@ -205,12 +208,24 @@ public class MainActivity extends Activity implements OnCompletionListener {
         }
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position,
+            long id) {
+        Log.d(APP, "onItemSelected from AdapterView " + parent);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Log.d(APP, "onNothingSelected from AdapterView " + parent);
+    }
+
     public void findMediaFiles() {
         // sets globals externalFiles, directory, and media
         try {
             externalFiles = appContext.getExternalFilesDir(null);
             ArrayAdapter<String> adapter;
             selectSchool = (Spinner)findViewById(R.id.schools);
+            selectSchool.setOnItemSelectedListener(this);
             directory = externalFiles;
             Log.d(APP, "Internal files path: " + directory +
                   " is directory: " + directory.isDirectory() +

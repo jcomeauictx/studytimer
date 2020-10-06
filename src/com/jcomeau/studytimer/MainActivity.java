@@ -5,6 +5,7 @@ package com.jcomeau.studytimer;
 // NOTE: Android 19 does not support String.join()!
 import java.util.Locale;
 import java.util.Arrays;
+import java.util.List;
 import java.io.IOException;
 import android.util.Log;
 import android.os.Bundle;
@@ -55,6 +56,12 @@ public class MainActivity extends Activity implements OnCompletionListener,
     Button listenButton;
     String[] STUDY_BUTTON_TEXT = {"Stop", "Study"};
     String[] LISTEN_BUTTON_TEXT = {"Stop", "Listen"};
+    List<Integer> SELECTIONS = Arrays.asList(
+        R.id.schools,
+        R.id.years,
+        R.id.classes,
+        0
+    );
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context appContext;
@@ -211,12 +218,16 @@ public class MainActivity extends Activity implements OnCompletionListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position,
             long id) {
-        Log.d(APP, "onItemSelected from AdapterView " + parent);
+        Log.d(APP, "onItemSelected called, SELECTIONS=" +
+              SELECTIONS.toString() +
+              ", parent " + parent.getId());
+        Log.d(APP, "onItemSelected from AdapterView " + 
+              SELECTIONS.indexOf(parent.getId()));
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        Log.d(APP, "onNothingSelected from AdapterView " + parent);
+        Log.d(APP, "onNothingSelected from AdapterView " + parent.getId());
     }
 
     public void findMediaFiles() {

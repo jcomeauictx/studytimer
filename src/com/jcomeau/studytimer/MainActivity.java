@@ -218,11 +218,13 @@ public class MainActivity extends Activity implements OnCompletionListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position,
             long id) {
+        int spinner = parent.getId();
+        int index = SELECTIONS.indexOf(spinner);
+        SELECTIONS.set(3, 1);
         Log.d(APP, "onItemSelected called, SELECTIONS=" +
               SELECTIONS.toString() +
-              ", parent " + parent.getId());
-        Log.d(APP, "onItemSelected from AdapterView " + 
-              SELECTIONS.indexOf(parent.getId()));
+              ", parent=" + spinner +
+              ", index=" + index);
     }
 
     @Override

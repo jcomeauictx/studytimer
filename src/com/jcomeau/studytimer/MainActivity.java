@@ -264,10 +264,13 @@ public class MainActivity extends Activity implements OnCompletionListener,
             }
         } else {
             // populate global `media`
+            Log.d(APP, "DIRECTORY: " + DIRECTORY.toString());
             directory = new File(join(
                 File.separator,
                 DIRECTORY.subList(0, index + 1)));
             media = directory.list(); Arrays.sort(media);
+            Log.d(APP, "Found " + media.length + " media files at " +
+                  directory.toString());
             mediaIndex = 0;
             mediaOffset = 0;
         }

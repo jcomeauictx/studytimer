@@ -78,7 +78,6 @@ public class MainActivity extends Activity implements OnCompletionListener,
     String active;  // button currently active if any
     String version;
     Environment environment;
-    File externalFiles, directory;
     String[] schools, years, classes, media;
     Spinner selectSchool, selectYear, selectClass;
     MediaPlayer player;
@@ -276,63 +275,6 @@ public class MainActivity extends Activity implements OnCompletionListener,
         Log.d(APP, "onNothingSelected from AdapterView " + parent.getId());
     }
 
-    public void findMediaFiles() {
-        // sets globals externalFiles, directory, and media
-        try {
-            externalFiles = appContext.getExternalFilesDir(null);
-            ArrayAdapter<String> adapter;
-            selectSchool = (Spinner)findViewById(R.id.schools);
-            selectSchool.setOnItemSelectedListener(this);
-            directory = externalFiles;
-            Log.d(APP, "files path: " + directory +
-                  " is directory: " + directory.isDirectory() +
-                  " is readable: " + directory.canRead());
-            schools = directory.list();
-            if (schools == null || schools.length == 0)
-                throw new Exception("no schools");
-            else
-                Log.d(APP, "first school: " + schools[0]);
-            adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, schools);
-            adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-            selectSchool.setAdapter(adapter);
-            selectYear = (Spinner)findViewById(R.id.years);
-            directory = new File(directory,
-                                 selectSchool.getSelectedItem().toString());
-            years = directory.list();
-            if (years == null || years.length == 0)
-                throw new Exception("no years");
-            else
-                Log.d(APP, "first year: " + years[0]);
-            adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, years);
-            adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-            selectYear.setAdapter(adapter);
-            selectClass = (Spinner)findViewById(R.id.classes);
-            directory = new File(directory,
-                                 selectYear.getSelectedItem().toString());
-            classes = directory.list();
-            if (classes == null || classes.length == 0)
-                throw new Exception("no classes");
-            else
-                Log.d(APP, "first class: " + classes[0]);
-            adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, classes);
-            adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-            selectClass.setAdapter(adapter);
-            directory = new File(directory,
-                                 selectClass.getSelectedItem().toString());
-            media = directory.list(); Arrays.sort(media);
-            Log.d(APP, "found " + media.length + " files in " + directory);
-        } catch (Exception failed) {
-            Log.e(APP, "populating spinners failed: " + failed);
-            findViewById(R.id.schoolyear).setVisibility(View.GONE);
-        }
-    }
-
     public String join(String separator, String[] pieces) {
         String joined = null;
         if (pieces.length > 0) joined = "";
@@ -388,8 +330,11 @@ public class MainActivity extends Activity implements OnCompletionListener,
 
     public void play() {
         try {
+            String directory = join(File.separator, DIRECTORY);
+            Log.d(APP, "DIRECTORY=" + DIRECTORY.toString() + ", directory=" +
+                  directory);
             String path = join(File.separator,
-                new String[] {directory.toString(), media[mediaIndex]});
+                new String[] {directory, media[mediaIndex]});
             Log.d(APP, "setting path of player " + player + " to " + path);
             player.setDataSource(path);
             Log.d(APP, "preparing player");

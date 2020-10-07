@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
                 .getPackageInfo(getPackageName(), 0);
             version = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException problem) {
-            Log.e(APP, "Error: " + problem);
+            Log.e(APP, "error: " + problem);
             version = "unknown";
         }
         Log.d(APP, "version: " + version);
@@ -161,15 +161,15 @@ public class MainActivity extends Activity implements OnCompletionListener,
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
         DIRECTORY.set(0, appContext.getExternalFilesDir(null).toString());
-        findMediaFiles();
+        this.onItemSelected(null, null, 0, 0);
         player = new MediaPlayer();
         player.setOnCompletionListener(this);
         if (active == "listen") {
             try {
                 play();
-                Log.d(APP, "Restarting play where left off.");
+                Log.d(APP, "restarting play where left off.");
             } catch (Exception problem) {
-                Log.e(APP, "Listen on recreate failed: " + problem);
+                Log.e(APP, "listen on recreate failed: " + problem);
                 // stop the clock if there was an error
                 listen(findViewById(R.id.listen));
             }
@@ -192,12 +192,12 @@ public class MainActivity extends Activity implements OnCompletionListener,
         try {
             player.stop();
         } catch (java.lang.IllegalStateException ignored) {
-            Log.d(APP, "No need to stop player");
+            Log.d(APP, "no need to stop player");
         }
         try {
             player.reset();
         } catch (java.lang.IllegalStateException ignored) {
-            Log.d(APP, "No need to reset player");
+            Log.d(APP, "no need to reset player");
         }
         super.onDestroy();
     }
@@ -205,17 +205,17 @@ public class MainActivity extends Activity implements OnCompletionListener,
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        Log.d(APP, "Saving instance state");
+        Log.d(APP, "saving instance state");
         elapsed = milliseconds(chronometer.getText().toString());
         state.putLong("elapsed", elapsed);
         state.putString("active", active);
         state.putInt("mediaIndex", mediaIndex);
         if (player != null && player.isPlaying()) {
-            Log.d(APP, "Saving current position of " + player);
+            Log.d(APP, "saving current position of " + player);
             try {
                 state.putInt("mediaOffset", player.getCurrentPosition());
             } catch (java.lang.IllegalStateException error) {
-                Log.e(APP, "Cannot save player position: " + error);
+                Log.e(APP, "cannot save player position: " + error);
             }
         } else {
             state.putInt("mediaOffset", mediaOffset);
@@ -227,52 +227,47 @@ public class MainActivity extends Activity implements OnCompletionListener,
             long id) {
         // This will be called on initialization of each spinner, and on
         // each user selection.
-        int spinner = parent.getId();
+        int spinner = parent == null ? 0 : parent.getId();
         int index = SELECTIONS.indexOf(spinner);
         File directory;
         ArrayAdapter<String> adapter;
         String[] listing;
-        Spinner child;
+        Spinner child = null;
         Log.d(APP, "onItemSelected called, SELECTIONS=" +
               SELECTIONS.toString() +
               ", parent=" + spinner +
               ", index=" + index +
-              ", view=" + view.toString() +
+              ", view=" + view +
               ", position=" + position +
               ", id=" + id);
-        if (SELECTIONS.get(index + 1) != 0) {
-            // reinitialize next downstream spinner
-            DIRECTORY.set(index, (String)parent.getItemAtPosition(position));
-            child = (Spinner)findViewById(SELECTIONS.get(index + 1));
-            directory = new File(join(
-                File.separator, DIRECTORY.subList(0, index + 1)));
-            Log.d(APP, "Files path: " + directory +
-                  " is directory: " + directory.isDirectory() +
-                  " is readable: " + directory.canRead());
-            listing = directory.list();
-            if (listing == null || listing.length == 0) {
-                Log.d(APP, "no files found in " + directory.toString());
-            } else {
-                Log.d(APP, "first selection: " + listing[0]);
-                adapter = new ArrayAdapter<String>(
-                    this, android.R.layout.simple_spinner_item, listing);
-                adapter.setDropDownViewResource(
-                    android.R.layout.simple_spinner_dropdown_item);
-                child.setAdapter(adapter);
-                // the following forces a bubbling down of calls to this routine
-                child.setOnItemSelectedListener(this);
-            }
-        } else {
+        // reinitialize next downstream spinner
+        if (parent != null) DIRECTORY.set(
+            index, (String)parent.getItemAtPosition(position));
+        directory = new File(join(
+            File.separator, DIRECTORY.subList(0, index + 1)));
+        Log.d(APP, "files path: " + directory +
+              " is directory: " + directory.isDirectory() +
+              " is readable: " + directory.canRead());
+        listing = directory.list();
+        if (listing == null || listing.length == 0) {
+            Log.d(APP, "no files found in " + directory.toString());
+        } else if (SELECTIONS.get(index + 1) == 0) {
             // populate global `media`
-            Log.d(APP, "DIRECTORY: " + DIRECTORY.toString());
-            directory = new File(join(
-                File.separator,
-                DIRECTORY.subList(0, index + 1)));
-            media = directory.list(); Arrays.sort(media);
-            Log.d(APP, "Found " + media.length + " media files at " +
+            media = listing; Arrays.sort(media);
+            Log.d(APP, "found " + media.length + " media files at " +
                   directory.toString());
             mediaIndex = 0;
             mediaOffset = 0;
+        } else {
+            Log.d(APP, "first selection: " + listing[0]);
+            adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, listing);
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+            child = (Spinner)findViewById(SELECTIONS.get(index + 1));
+            child.setAdapter(adapter);
+            // the following forces a bubbling down of calls to this routine
+            child.setOnItemSelectedListener(this);
         }
     }
 
@@ -289,7 +284,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
             selectSchool = (Spinner)findViewById(R.id.schools);
             selectSchool.setOnItemSelectedListener(this);
             directory = externalFiles;
-            Log.d(APP, "Files path: " + directory +
+            Log.d(APP, "files path: " + directory +
                   " is directory: " + directory.isDirectory() +
                   " is readable: " + directory.canRead());
             schools = directory.list();
@@ -333,7 +328,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
             media = directory.list(); Arrays.sort(media);
             Log.d(APP, "found " + media.length + " files in " + directory);
         } catch (Exception failed) {
-            Log.e(APP, "Populating spinners failed: " + failed);
+            Log.e(APP, "populating spinners failed: " + failed);
             findViewById(R.id.schoolyear).setVisibility(View.GONE);
         }
     }
@@ -395,22 +390,22 @@ public class MainActivity extends Activity implements OnCompletionListener,
         try {
             String path = join(File.separator,
                 new String[] {directory.toString(), media[mediaIndex]});
-            Log.d(APP, "Setting path of player " + player + " to " + path);
+            Log.d(APP, "setting path of player " + player + " to " + path);
             player.setDataSource(path);
-            Log.d(APP, "Preparing player");
+            Log.d(APP, "preparing player");
             player.prepare();
             if (mediaOffset > 0) player.seekTo(mediaOffset);
-            Log.d(APP, "Starting play of " + media[mediaIndex] +
+            Log.d(APP, "starting play of " + media[mediaIndex] +
                   " at position " + mediaOffset);
             player.start();
         } catch (IllegalStateException | IOException error) {
-            Log.e(APP, "Failed to play media: " + error);
+            Log.e(APP, "failed to play media: " + error);
             listen(findViewById(R.id.listen)); // toggle state back to idle
         }
     }
 
     public void onCompletion(MediaPlayer player) {
-        Log.d(APP, "Play of audio file completed");
+        Log.d(APP, "play of audio file completed");
         mediaOffset = 0;  // shouldn't have to do this, but sometimes
         // following file starts at previous offset
         player.seekTo(mediaOffset);

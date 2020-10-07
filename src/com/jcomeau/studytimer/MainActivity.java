@@ -6,6 +6,7 @@ package com.jcomeau.studytimer;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 import android.util.Log;
 import android.os.Bundle;
@@ -56,12 +57,17 @@ public class MainActivity extends Activity implements OnCompletionListener,
     Button listenButton;
     String[] STUDY_BUTTON_TEXT = {"Stop", "Study"};
     String[] LISTEN_BUTTON_TEXT = {"Stop", "Listen"};
+    // Following two Lists must be identical length
+    // SELECTIONS[0] = 0 for no particular reason, it's just a placeholder
+    // SELECTIONS[4] = 0 to indicate no more spinners after R.id.classes
     List<Integer> SELECTIONS = Arrays.asList(
+        0,
         R.id.schools,
         R.id.years,
         R.id.classes,
         0
     );
+    List<String> DIRECTORY = Arrays.asList("", "", "", "", "");
     AlarmManager alarmManager;
     PendingIntent alarmIntent;
     Context appContext;
@@ -154,6 +160,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
         }
         getWindow().addFlags(SCREEN_ON);
         environment = new Environment();
+        DIRECTORY.set(0, appContext.getExternalFilesDir(null).toString());
         findMediaFiles();
         player = new MediaPlayer();
         player.setOnCompletionListener(this);
@@ -218,13 +225,52 @@ public class MainActivity extends Activity implements OnCompletionListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position,
             long id) {
+        // This will be called on initialization of each spinner, and on
+        // each user selection.
         int spinner = parent.getId();
         int index = SELECTIONS.indexOf(spinner);
-        SELECTIONS.set(3, 1);
+        File directory;
+        ArrayAdapter<String> adapter;
+        String[] listing;
+        Spinner child;
         Log.d(APP, "onItemSelected called, SELECTIONS=" +
               SELECTIONS.toString() +
               ", parent=" + spinner +
-              ", index=" + index);
+              ", index=" + index +
+              ", view=" + view.toString() +
+              ", position=" + position +
+              ", id=" + id);
+        if (SELECTIONS.get(index + 1) != 0) {
+            // reinitialize next downstream spinner
+            DIRECTORY.set(index, (String)parent.getItemAtPosition(position));
+            child = (Spinner)findViewById(SELECTIONS.get(index + 1));
+            directory = new File(join(
+                File.separator, DIRECTORY.subList(0, index + 1)));
+            Log.d(APP, "Files path: " + directory +
+                  " is directory: " + directory.isDirectory() +
+                  " is readable: " + directory.canRead());
+            listing = directory.list();
+            if (listing == null || listing.length == 0) {
+                Log.d(APP, "no files found in " + directory.toString());
+            } else {
+                Log.d(APP, "first selection: " + listing[0]);
+                adapter = new ArrayAdapter<String>(
+                    this, android.R.layout.simple_spinner_item, listing);
+                adapter.setDropDownViewResource(
+                    android.R.layout.simple_spinner_dropdown_item);
+                child.setAdapter(adapter);
+                // the following forces a bubbling down of calls to this routine
+                child.setOnItemSelectedListener(this);
+            }
+        } else {
+            // populate global `media`
+            directory = new File(join(
+                File.separator,
+                DIRECTORY.subList(0, index + 1)));
+            media = directory.list(); Arrays.sort(media);
+            mediaIndex = 0;
+            mediaOffset = 0;
+        }
     }
 
     @Override
@@ -240,7 +286,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
             selectSchool = (Spinner)findViewById(R.id.schools);
             selectSchool.setOnItemSelectedListener(this);
             directory = externalFiles;
-            Log.d(APP, "Internal files path: " + directory +
+            Log.d(APP, "Files path: " + directory +
                   " is directory: " + directory.isDirectory() +
                   " is readable: " + directory.canRead());
             schools = directory.list();
@@ -289,7 +335,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
         }
     }
 
-    public String join(String separator, String ...pieces) {
+    public String join(String separator, String[] pieces) {
         String joined = null;
         if (pieces.length > 0) joined = "";
         for (int i = 0; i < pieces.length; i++) {
@@ -297,6 +343,10 @@ public class MainActivity extends Activity implements OnCompletionListener,
             if (i < pieces.length - 1) joined += separator;
         }
         return joined;
+    }
+
+    public String join(String separator, List pieces) {
+        return join(separator, (String[])pieces.toArray());
     }
 
     public long milliseconds(String time) {
@@ -340,9 +390,8 @@ public class MainActivity extends Activity implements OnCompletionListener,
 
     public void play() {
         try {
-            findMediaFiles();
-            String path = join(File.separator, directory.toString(),
-                               media[mediaIndex]);
+            String path = join(File.separator,
+                new String[] {directory.toString(), media[mediaIndex]});
             Log.d(APP, "Setting path of player " + player + " to " + path);
             player.setDataSource(path);
             Log.d(APP, "Preparing player");

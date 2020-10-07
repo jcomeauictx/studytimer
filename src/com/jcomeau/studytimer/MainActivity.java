@@ -346,7 +346,7 @@ public class MainActivity extends Activity implements OnCompletionListener,
     }
 
     public String join(String separator, List pieces) {
-        return join(separator, (String[])pieces.toArray());
+        return join(separator, (String[])pieces.toArray(new String[0]));
     }
 
     public long milliseconds(String time) {

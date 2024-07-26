@@ -90,6 +90,25 @@ $(HOME)/$(APPNAME)key.keystore:
 	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048
+newkeys: $(HOME)/$(APPNAME).keystore.p12
+$(HOME)/$(APPNAME).keystore.p12: $(HOME)/$(APPNAME)key.keystore
+	@echo Enter both store password and key password as Google password
+	keytool \
+	 -importkeystore \
+	 -srckeystore $< \
+	 -srcstorepass $(APPNAME) \
+	 -srckeypass $(APPNAME) \
+	 -srcalias $(APPNAME) \
+	 -destalias $(APPNAME) \
+	 -destkeystore $@ \
+	 -deststoretype PKCS12
+cert: $(HOME)/$(APPNAME).cert.pem
+$(HOME)/$(APPNAME).cert.pem: $(HOME)/$(APPNAME).keystore.p12
+	openssl pkcs12 \
+	 -in $< \
+	 -nodes \
+	 -nocerts \
+	 -out $@
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo Enter password as: $(APPNAME)
 	jarsigner \

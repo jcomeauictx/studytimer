@@ -142,11 +142,14 @@ studytimer: .FORCE
 .FORCE:
 shell:
 	bash -i
-exportkey: $(HOME)/etc/ssl
+exportkey: $(HOME)/etc/ssl/appstore_upload_certificate.pem
+$(HOME)/etc/ssl/appstore_upload_certificate.pem: $(HOME)/etc/ssl
 	keytool -export -rfc \
 	 -keystore $(HOME)/$(APPNAME)key.keystore \
 	 -alias $(APPNAME) \
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
+exportkey.view: $(HOME)/etc/ssl/appstore_upload_certificate.pem
+	openssl x509 -in $< -noout -text
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device
 	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"

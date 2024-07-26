@@ -80,12 +80,13 @@ version:
 	java -version
 list:
 	$(TOOLS)/zipalign -cv 4 $(APK)
-keys:
+keys: $(HOME)/$(APPNAME)key.keystore
+$(HOME)/$(APPNAME)key.keystore:
 	@echo Enter password as: $(APPNAME)
 	keytool \
 	 -genkeypair \
 	 -validity 10000 \
-	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 -keystore $@ \
 	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048

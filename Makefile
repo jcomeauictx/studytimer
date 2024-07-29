@@ -123,6 +123,7 @@ $(NEW_KEYSTORE): $(KEYSTORE)
 	 -deststoretype PKCS12
 cert: $(HOME)/$(APPNAME).cert.pem
 $(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
+	@echo Enter both store password and key password as Google password
 	openssl pkcs12 \
 	 -in $< \
 	 -nodes \

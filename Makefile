@@ -17,6 +17,10 @@ DX ?= $(shell which $(DEBTOOLS)/dx $(TOOLS)/dx false 2>/dev/null | head -n 1)
 ZIPALIGN ?= $(shell which $(DEBTOOLS)/zipalign \
  $(TOOLS)/zipalign \
  false 2>/dev/null | head -n 1)
+JAVA ?= $(shell which java $(DEBTOOLS)/java \
+ $(TOOLS)/java false 2>/dev/null | head -n 1)
+JAVAC ?= $(shell which javac $(DEBTOOLS)/javac \
+ $(TOOLS)/javac false 2>/dev/null | head -n 1)
 # MUST use java 7 with this version of Android tools!
 #PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
 PATH := /usr/local/src/jdk1.7.0_80/bin:$(TOOLS):$(PATH)
@@ -65,7 +69,7 @@ src/$(APPPATH)/R.java: $(RESOURCES)
 # com.android.dx.cf.iface.ParseException: bad class file magic (cafebabe)
 # or version (0034.0000)
 $(CLASSES): $(SOURCES)
-	javac -d obj \
+	$(JAVAC) -d obj \
 	 -source 1.7 \
 	 -target 1.7 \
 	 -classpath src \
@@ -89,9 +93,10 @@ bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 edit: $(EDITABLE)
 	vi $+
 env:
-	env
+	env | grep -v '^LS_COLORS'
 version:
-	java -version
+	$(JAVA) -version
+	$(JAVAC) -version
 list:
 	$(ZIPALIGN) -cv 4 $(APK)
 keys: $(KEYSTORE)
@@ -189,11 +194,11 @@ classes:
 	ls "$(AUDIO)"
 # https://play.google.com/console/developers/8507177076018030452/
 #  app/4971993077044930911/keymanagement
-upload_key: $(HOME)/google_privkey/new
-$(HOME)/google_privkey/new:
-	java -jar $(USBKEY)/pepk.jar \
+upload_key: $(HOME)/google_privkey.pem
+$(HOME)/google_privkey.pem:
+	$(JAVA) -jar $(USBKEY)/pepk.jar \
 	 --keystore=$(KEYSTORE) \
 	 --alias=$(APPNAME) \
-	 --output=encrypted_private_key_path \
+	 --output=$@ \
 	 --rsa-aes-encryption \
 	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem

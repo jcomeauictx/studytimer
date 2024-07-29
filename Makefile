@@ -5,6 +5,18 @@ MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
 ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
+# use Debian tools when available
+DEBTOOLS := /usr/bin
+AAPT ?= $(shell which $(DEBTOOLS)/aapt \
+ $(TOOLS)/aapt \
+ false 2>/dev/null | head -n 1)
+KEYTOOL ?= $(shell which $(DEBTOOLS)/keytool \
+ $(TOOLS)/keytool \
+ false 2>/dev/null | head -n 1)
+DX ?= $(shell which $(DEBTOOLS)/dx $(TOOLS)/dx false 2>/dev/null | head -n 1)
+ZIPALIGN ?= $(shell which $(DEBTOOLS)/zipalign \
+ $(TOOLS)/zipalign \
+ false 2>/dev/null | head -n 1)
 # MUST use java 7 with this version of Android tools!
 #PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
 PATH := /usr/local/src/jdk1.7.0_80/bin:$(TOOLS):$(PATH)
@@ -41,7 +53,7 @@ build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
 src/$(APPPATH)/R.java: $(RESOURCES)
-	$(TOOLS)/aapt package $(DEBUG) -f -m \
+	$(AAPT) package $(DEBUG) -f -m \
 	 --version-name $(VERSION) \
 	 -J src \
 	 -M $(MANIFEST) \
@@ -58,19 +70,19 @@ $(CLASSES): $(SOURCES)
 	 -bootclasspath $(ANDROID) \
 	 $+
 bin/classes.dex: $(CLASSES)
-	/bin/bash -x $(TOOLS)/dx \
+	/bin/bash -x $(DX) \
 	 --dex \
 	 --output=$@ \
 	 obj
 bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
-	$(TOOLS)/aapt package -f -m $(DEBUG) \
+	$(AAPT) package -f -m $(DEBUG) \
 	 --version-name $(VERSION) \
 	 -F $@ \
 	 -M $(MANIFEST) \
 	 -S res \
 	 -I $(ANDROID)
 	cp $< .  # copy dex here temporarily
-	$(TOOLS)/aapt add $@ classes.dex
+	$(AAPT) add $@ classes.dex
 	rm $(<F)  # remove the copy
 edit: $(EDITABLE)
 	vi $+
@@ -79,11 +91,11 @@ env:
 version:
 	java -version
 list:
-	$(TOOLS)/zipalign -cv 4 $(APK)
+	$(ZIPALIGN) -cv 4 $(APK)
 keys: $(HOME)/$(APPNAME)key.keystore
 $(HOME)/$(APPNAME)key.keystore:
 	@echo Enter password as: $(APPNAME)
-	keytool \
+	$(KEYTOOL) \
 	 -genkeypair \
 	 -validity 10000 \
 	 -keystore $@ \
@@ -93,7 +105,7 @@ $(HOME)/$(APPNAME)key.keystore:
 newkeys: $(HOME)/$(APPNAME).keystore.p12
 $(HOME)/$(APPNAME).keystore.p12: $(HOME)/$(APPNAME)key.keystore
 	@echo Enter both store password and key password as Google password
-	keytool \
+	$(KEYTOOL) \
 	 -importkeystore \
 	 -srckeystore $< \
 	 -srcstorepass $(APPNAME) \
@@ -120,14 +132,14 @@ $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	mv $< $@
 $(APK): $(APK:.apk=.signed.apk)
 	rm -f $@
-	$(TOOLS)/zipalign -f 4 $< $@
+	$(ZIPALIGN) -f 4 $< $@
 	cp -i $@ ~/Downloads/
 tools:
 	ls $(TOOLS)
 install:
 	$(ADB) install $(APK)
 uninstall:
-	$(ADB) uninstall $(PACKAGE)
+	-$(ADB) uninstall $(PACKAGE)
 reinstall: uninstall install
 test:
 	$(ADB) shell am start -n $(PACKAGE)/.MainActivity
@@ -144,7 +156,7 @@ shell:
 	bash -i
 exportkey: $(HOME)/etc/ssl/appstore_upload_certificate.pem
 $(HOME)/etc/ssl/appstore_upload_certificate.pem: $(HOME)/etc/ssl
-	keytool -export -rfc \
+	$(KEYTOOL) -export -rfc \
 	 -keystore $(HOME)/$(APPNAME)key.keystore \
 	 -alias $(APPNAME) \
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem

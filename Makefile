@@ -46,6 +46,8 @@ AUDIO := $(wildcard $(USBKEY)/$(YEAR)*MP3)
 FIRSTAUDIO ?= $(notdir $(shell cd "$(AUDIO)" && find . -type d | sed -n 2p))
 SINGLEAUDIO := $(notdir $(shell cd "$(AUDIO)"/"$(FIRSTAUDIO)" && ls 02*))
 STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
+KEYSTORE ?= $(HOME)/$(APPNAME)key.keystore
+NEW_KEYSTORE ?= $(HOME)/$(APPNAME).keystore.p12
 export
 all: rebuild reinstall copysingle
 rebuild: clean build
@@ -92,8 +94,8 @@ version:
 	java -version
 list:
 	$(ZIPALIGN) -cv 4 $(APK)
-keys: $(HOME)/$(APPNAME)key.keystore
-$(HOME)/$(APPNAME)key.keystore:
+keys: $(KEYSTORE)
+$(KEYSTORE):
 	@echo Enter password as: $(APPNAME)
 	$(KEYTOOL) \
 	 -genkeypair \
@@ -102,8 +104,8 @@ $(HOME)/$(APPNAME)key.keystore:
 	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048
-newkeys: $(HOME)/$(APPNAME).keystore.p12
-$(HOME)/$(APPNAME).keystore.p12: $(HOME)/$(APPNAME)key.keystore
+newkeys: $(NEW_KEYSTORE)
+$(NEW_KEYSTORE): $(KEYSTORE)
 	@echo Enter both store password and key password as Google password
 	$(KEYTOOL) \
 	 -importkeystore \
@@ -115,7 +117,7 @@ $(HOME)/$(APPNAME).keystore.p12: $(HOME)/$(APPNAME)key.keystore
 	 -destkeystore $@ \
 	 -deststoretype PKCS12
 cert: $(HOME)/$(APPNAME).cert.pem
-$(HOME)/$(APPNAME).cert.pem: $(HOME)/$(APPNAME).keystore.p12
+$(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
 	openssl pkcs12 \
 	 -in $< \
 	 -nodes \
@@ -127,7 +129,7 @@ $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
-	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 -keystore $(KEYSTORE) \
 	 $< $(APPNAME)
 	mv $< $@
 $(APK): $(APK:.apk=.signed.apk)
@@ -157,7 +159,7 @@ shell:
 exportkey: $(HOME)/etc/ssl/appstore_upload_certificate.pem
 $(HOME)/etc/ssl/appstore_upload_certificate.pem: $(HOME)/etc/ssl
 	$(KEYTOOL) -export -rfc \
-	 -keystore $(HOME)/$(APPNAME)key.keystore \
+	 -keystore $(KEYSTORE) \
 	 -alias $(APPNAME) \
 	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
 exportkey.view: $(HOME)/etc/ssl/appstore_upload_certificate.pem
@@ -185,3 +187,13 @@ logcat:
 	$(ADB) $@ | sed -n '/BufferQueueProducer/n; /$(APPNAME)/p'
 classes:
 	ls "$(AUDIO)"
+# https://play.google.com/console/developers/8507177076018030452/
+#  app/4971993077044930911/keymanagement
+upload_key: $(HOME)/google_privkey/new
+$(HOME)/google_privkey/new:
+	java -jar $(USBKEY)/pepk.jar \
+	 --keystore=$(KEYSTORE) \
+	 --alias=$(APPNAME) \
+	 --output=encrypted_private_key_path \
+	 --rsa-aes-encryption \
+	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem

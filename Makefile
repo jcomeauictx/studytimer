@@ -109,26 +109,6 @@ $(KEYSTORE):
 	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048
-newkeys: $(NEW_KEYSTORE)
-$(NEW_KEYSTORE): $(KEYSTORE)
-	@echo Enter both store password and key password as Google password
-	$(KEYTOOL) \
-	 -importkeystore \
-	 -srckeystore $< \
-	 -srcstorepass $(APPNAME) \
-	 -srckeypass $(APPNAME) \
-	 -srcalias $(APPNAME) \
-	 -destalias $(APPNAME) \
-	 -destkeystore $@ \
-	 -deststoretype PKCS12
-cert: $(HOME)/$(APPNAME).cert.pem
-$(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
-	@echo Enter both store password and key password as Google password
-	openssl pkcs12 \
-	 -in $< \
-	 -nodes \
-	 -nocerts \
-	 -out $@
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo Enter password as: $(APPNAME)
 	jarsigner \
@@ -197,6 +177,27 @@ classes:
 #  app/4971993077044930911/keymanagement
 # Upload this to the above page under ^ Upload private key, step 4
 # of ## Let Google Play manage your app signing key
+newkeys: $(NEW_KEYSTORE)
+$(NEW_KEYSTORE): $(KEYSTORE)
+	@echo Enter both store password and key password as Google password
+	$(KEYTOOL) \
+	 -importkeystore \
+	 -srckeystore $< \
+	 -srcstorepass $(APPNAME) \
+	 -srckeypass $(APPNAME) \
+	 -srcalias $(APPNAME) \
+	 -destalias $(APPNAME) \
+	 -destkeystore $@ \
+	 -deststoretype PKCS12
+cert: $(HOME)/$(APPNAME).cert.pem
+$(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
+	@echo Enter both store password and key password as Google password
+	openssl pkcs12 \
+	 -in $< \
+	 -nodes \
+	 -nocerts \
+	 -out $@
+# note: upload_key isn't working for anything, ignore it
 upload_key: $(HOME)/google_privkey.dat
 $(HOME)/google_privkey.dat:
 	$(JAVA) -jar $(USBKEY)/pepk.jar \

@@ -205,3 +205,13 @@ $(HOME)/google_privkey.dat:
 	 --output=$@ \
 	 --rsa-aes-encryption \
 	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem
+new_upload_key: $(HOME)/google_privkey_new.zip
+$(HOME)/google_privkey_new.zip:
+	@echo keystore password is google pass; key password is same as before
+	$(JAVA) -jar $(USBKEY)/pepk.jar \
+	 --keystore=$(NEW_KEYSTORE) \
+	 --alias=$(APPNAME) \
+	 --output=$@ \
+	 --include-cert \
+	 --rsa-aes-encryption \
+	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem

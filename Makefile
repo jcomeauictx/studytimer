@@ -197,17 +197,8 @@ $(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
 	 -nodes \
 	 -nocerts \
 	 -out $@
-# note: upload_key isn't working for anything, ignore it
-upload_key: $(HOME)/google_privkey.dat
-$(HOME)/google_privkey.dat:
-	$(JAVA) -jar $(USBKEY)/pepk.jar \
-	 --keystore=$(KEYSTORE) \
-	 --alias=$(APPNAME) \
-	 --output=$@ \
-	 --rsa-aes-encryption \
-	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem
-new_upload_key: $(HOME)/google_privkey_new.zip
-$(HOME)/google_privkey_new.zip:
+new_appsign_key: $(HOME)/studytimer_privkey_new.zip
+$(HOME)/studytimer_privkey_new.zip:
 	@echo keystore password is google pass; key password is same as before
 	$(JAVA) -jar $(USBKEY)/pepk.jar \
 	 --keystore=$(NEW_KEYSTORE) \

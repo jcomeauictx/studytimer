@@ -195,8 +195,10 @@ classes:
 	ls "$(AUDIO)"
 # https://play.google.com/console/developers/8507177076018030452/
 #  app/4971993077044930911/keymanagement
-upload_key: $(HOME)/google_privkey.pem
-$(HOME)/google_privkey.pem:
+# Upload this to the above page under ^ Upload private key, step 4
+# of ## Let Google Play manage your app signing key
+upload_key: $(HOME)/google_privkey.dat
+$(HOME)/google_privkey.dat:
 	$(JAVA) -jar $(USBKEY)/pepk.jar \
 	 --keystore=$(KEYSTORE) \
 	 --alias=$(APPNAME) \

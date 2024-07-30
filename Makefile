@@ -143,13 +143,13 @@ studytimer: .FORCE
 .FORCE:
 shell:
 	bash -i
-exportkey: $(HOME)/etc/ssl/appstore_upload_certificate.pem
-$(HOME)/etc/ssl/appstore_upload_certificate.pem: $(HOME)/etc/ssl
+exportkey: $(HOME)/appstore_upload_certificate.pem
+$(HOME)appstore_upload_certificate.pem:
 	$(KEYTOOL) -export -rfc \
 	 -keystore $(KEYSTORE) \
 	 -alias $(APPNAME) \
-	 -file $(HOME)/etc/ssl/appstore_upload_certificate.pem
-exportkey.view: $(HOME)/etc/ssl/appstore_upload_certificate.pem
+	 -file $@
+exportkey.view: $(HOME)/appstore_upload_certificate.pem
 	openssl x509 -in $< -noout -text
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device

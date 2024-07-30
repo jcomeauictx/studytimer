@@ -200,9 +200,9 @@ $(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
 	 -out $@
 new_appsign_key: $(HOME)/studytimer_privkey_new.pem
 $(HOME)/studytimer_privkey_new.pem:
-	@echo 'keystore password is google pass, key password is same as before'
+	@echo 'keystore and key passwords same as before'
 	$(JAVA) -jar $(USBKEY)/pepk.jar \
-	 --keystore=$(NEW_KEYSTORE) \
+	 --keystore=$(KEYSTORE) \
 	 --alias=$(APPNAME) \
 	 --output=$@ \
 	 --rsa-aes-encryption \

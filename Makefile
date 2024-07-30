@@ -13,6 +13,9 @@ BUNDLETOOL_JAR := $(HOME)/Downloads/bundletool-all-1.17.1.jar
 AAPT ?= $(shell which $(DEBTOOLS)/aapt \
  $(TOOLS)/aapt \
  false 2>/dev/null | head -n 1)
+AAPT2 ?= $(shell which $(DEBTOOLS)/aapt2 \
+ $(TOOLS)/aapt2 \
+ false 2>/dev/null | head -n 1)
 KEYTOOL ?= $(shell which $(DEBTOOLS)/keytool \
  $(TOOLS)/keytool \
  false 2>/dev/null | head -n 1)

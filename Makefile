@@ -40,6 +40,9 @@ OTHER := README.md
 EDITABLE := $(filter-out $(RAW), $(filter-out $(R), \
 	     $(SOURCES)) $(RESOURCES) $(MANIFEST)) $(OTHER)
 APK := bin/$(APPNAME).apk
+# new AAB build process
+# https://developer.android.com/build/building-cmdline
+AAB := bin/$(APPNAME).aab
 DIRS := obj bin res/drawable libs
 TIMESTAMP ?= $(shell date +%Y%m%d%H%M%S)
 DEBUG ?= #--debug-mode
@@ -116,6 +119,7 @@ $(KEYSTORE):
 	 -alias $(APPNAME) \
 	 -keyalg RSA \
 	 -keysize 2048
+$(AAB): $(wildcard res_compiled/*.flat)
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo Enter password as: $(APPNAME)
 	jarsigner \

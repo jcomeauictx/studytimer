@@ -52,6 +52,7 @@ SINGLEAUDIO := $(notdir $(shell cd "$(AUDIO)"/"$(FIRSTAUDIO)" && ls 02*))
 STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
 KEYSTORE ?= $(HOME)/$(APPNAME)key.keystore
 NEW_KEYSTORE ?= $(HOME)/$(APPNAME).keystore.p12
+UPLOAD_KEYSTORE ?= $(HOME)/google_upload.keystore
 export
 all: rebuild reinstall copysingle
 rebuild: clean build
@@ -197,13 +198,30 @@ $(HOME)/$(APPNAME).cert.pem: $(NEW_KEYSTORE)
 	 -nodes \
 	 -nocerts \
 	 -out $@
-new_appsign_key: $(HOME)/studytimer_privkey_new.zip
-$(HOME)/studytimer_privkey_new.zip:
-	@echo keystore password is google pass; key password is same as before
+new_appsign_key: $(HOME)/studytimer_privkey_new.pem
+$(HOME)/studytimer_privkey_new.pem:
+	@echo 'keystore password is google pass, key password is same as before'
 	$(JAVA) -jar $(USBKEY)/pepk.jar \
 	 --keystore=$(NEW_KEYSTORE) \
 	 --alias=$(APPNAME) \
 	 --output=$@ \
-	 --include-cert \
 	 --rsa-aes-encryption \
 	 --encryption-key-path=$(USBKEY)/encryption_public_key.pem
+$(UPLOAD_KEYSTORE):
+	@echo 'Enter password(s) as google pass'
+	$(KEYTOOL) \
+	 -genkeypair \
+	 -validity 10000 \
+	 -keystore $@ \
+	 -alias upload \
+	 -keyalg RSA \
+	 -keysize 2048
+upload_cert: $(HOME)/upload_cert.pem
+$(HOME)/upload_cert.pem: $(UPLOAD_KEYSTORE)
+	@echo 'Enter password(s) as google pass'
+	$(KEYTOOL) \
+	 -export \
+	 -rfc \
+	 -keystore $(UPLOAD_KEYSTORE) \
+	 -alias upload \
+	 -file $@

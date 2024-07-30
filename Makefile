@@ -1,5 +1,5 @@
 APPNAME := $(notdir $(PWD))
-PACKAGE := com.jcomeau.$(APPNAME)
+PACKAGE := com.gnixl.$(APPNAME)
 APPPATH := $(subst .,/,$(PACKAGE))
 MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk

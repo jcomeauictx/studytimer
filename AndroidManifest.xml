@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <manifest xmlns:android='http://schemas.android.com/apk/res/android'
-  package='com.jcomeau.studytimer'
+  package='com.gnixl.studytimer'
   android:versionCode='1'>
  <uses-sdk android:minSdkVersion="23"
   android:targetSdkVersion="28"

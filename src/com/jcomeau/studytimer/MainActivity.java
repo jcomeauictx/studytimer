@@ -1,4 +1,4 @@
-package com.jcomeau.studytimer;
+package com.gnixl.studytimer;
 // sample code from https://medium.com/@authmane512/
 // how-to-build-an-apk-from-command-line-without-ide-7260e1e22676
 // and other samples on StackOverflow and elsewhere
@@ -39,7 +39,7 @@ import java.io.File;
 public class MainActivity extends Activity implements OnCompletionListener,
         OnItemSelectedListener {
     String APP = "studytimer";
-    String PACKAGE = "com.jcomeau." + APP;
+    String PACKAGE = "com.gnixl." + APP;
     String ACTION = PACKAGE + ".NAG";
     // https://medium.com/@elye.project/
     // checking-debug-build-the-right-way-d12da1098120

@@ -1,9 +1,11 @@
+SHELL := /bin/bash
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.gnixl.$(APPNAME)
 APPPATH := $(subst .,/,$(PACKAGE))
 MINVER := 19
 SDK := /usr/local/src/android/adt-bundle-linux-x86_64-20130717/sdk
-ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
+PLATFORM := $(SDK)/platforms/android-$(MINVER)
+ANDROID := $(PLATFORM)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 # use Debian tools when available
 DEBTOOLS := /usr/bin
@@ -90,6 +92,7 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
+ifndef NEW_PROCESS
 bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	$(AAPT) package -f -m $(DEBUG) \
 	 --version-name $(VERSION) \
@@ -100,6 +103,16 @@ bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	cp $< .  # copy dex here temporarily
 	$(AAPT) add $@ classes.dex
 	rm $(<F)  # remove the copy
+else
+bin/$(APPNAME).unsigned.apk: res_compiled
+	$(AAPT2) link --proto-format -o $@ \
+	 -I $(ANDROID) \
+	 --manifest $(MANIFEST) \
+	 -R $</*.flat --auto-add-overlay
+res_compiled: res
+	mkdir -p $@
+	$(AAPT2) compile $(shell find $</ -type f) -o $@/
+endif
 edit: $(EDITABLE)
 	vi $+
 env:

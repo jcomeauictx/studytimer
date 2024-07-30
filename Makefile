@@ -144,13 +144,21 @@ studytimer: .FORCE
 shell:
 	bash -i
 exportkey: $(HOME)/appstore_upload_certificate.pem
-$(HOME)appstore_upload_certificate.pem:
+$(HOME)/appstore_upload_certificate.pem:
 	$(KEYTOOL) -export -rfc \
 	 -keystore $(KEYSTORE) \
 	 -alias $(APPNAME) \
 	 -file $@
-exportkey.view: $(HOME)/appstore_upload_certificate.pem
-	openssl x509 -in $< -noout -text
+%.view: %.pem
+	@echo viewing $< >&2
+	-openssl x509 -in $< -noout -text
+%.fp: %.pem
+	@echo viewing fingerprint of $< >&2
+	-openssl x509 -in $< -noout -fingerprint
+certs: $(HOME)/appstore_upload_certificate.view \
+ $(HOME)/studytimer_privkey_new.view $(HOME)/upload_cert.view
+fps: $(HOME)/appstore_upload_certificate.fp \
+ $(HOME)/studytimer_privkey_new.fp $(HOME)/upload_cert.fp
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device
 	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"

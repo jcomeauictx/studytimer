@@ -7,6 +7,9 @@ ANDROID := $(SDK)/platforms/android-$(MINVER)/android.jar
 TOOLS := $(wildcard $(SDK)/build-tools/$(MINVER)*/)
 # use Debian tools when available
 DEBTOOLS := /usr/bin
+# https://developer.android.com/tools/bundletool
+# for building .aab files, Android App Bundles
+BUNDLETOOL_JAR := $(HOME)/Downloads/bundletool-all-1.17.1.jar
 AAPT ?= $(shell which $(DEBTOOLS)/aapt \
  $(TOOLS)/aapt \
  false 2>/dev/null | head -n 1)

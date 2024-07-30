@@ -1,4 +1,7 @@
 SHELL := /bin/bash
+# attempt to build using new process, has to be working by 2024-10-01
+# if building for immediate installation on phone, use `make NEW_PROCESS=`
+NEW_PROCESS ?= 1
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.gnixl.$(APPNAME)
 APPPATH := $(subst .,/,$(PACKAGE))
@@ -12,6 +15,7 @@ DEBTOOLS := /usr/bin
 # https://developer.android.com/tools/bundletool
 # for building .aab files, Android App Bundles
 BUNDLETOOL_JAR := $(HOME)/Downloads/bundletool-all-1.17.1.jar
+BUNDLETOOL := $(JAVA) -jar $(BUNDLETOOL_JAR)
 AAPT ?= $(shell which $(DEBTOOLS)/aapt \
  $(TOOLS)/aapt \
  false 2>/dev/null | head -n 1)
@@ -65,7 +69,12 @@ KEYSTORE ?= $(HOME)/$(APPNAME)key.keystore
 NEW_KEYSTORE ?= $(HOME)/$(APPNAME).keystore.p12
 UPLOAD_KEYSTORE ?= $(HOME)/google_upload.keystore
 export
+ifndef NEW_PROCESS
 all: rebuild reinstall copysingle
+else:
+# new build process creates uninstallable (at least on my phone) APK
+all: rebuild $(AAB)
+endif
 rebuild: clean build
 build: $(DIRS) $(R) $(APK)
 clean:
@@ -104,6 +113,25 @@ bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	$(AAPT) add $@ classes.dex
 	rm $(<F)  # remove the copy
 else
+$(AAB): base.zip
+	$(BUNDLETOOL) build-bundle --modules=$< --output=$@
+base.zip: temp
+	(cd temp && zip -r ../$@ .)
+temp: bin/$(APPNAME).unsigned.apk bin/classes.dex .FORCE
+	rm -rf $@
+	mkdir -p $@/manifest $@/dex
+	unzip -d $@ $<
+	mv $@/AndroidManifest.xml $@/manifest
+	cp bin/classes.dex $@/dex
+	for directory in $(shell find res/ -type d); do \
+	 (cd temp && mkdir -p $$directory); \
+	done
+	for file in $(shell find $@ -maxdepth 0 -type f); do \
+	 path=$(shell find res/ -type f -name $$file); \
+	 if [ "$$path" ]; then \
+	  cp $$file $@/$(dir $$path)/; \
+	 fi; \
+	done
 bin/$(APPNAME).unsigned.apk: res_compiled
 	$(AAPT2) link --proto-format -o $@ \
 	 -I $(ANDROID) \

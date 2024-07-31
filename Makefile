@@ -129,11 +129,12 @@ endif
 $(AAB): base.zip
 	@echo DEBUG:building $@
 	$(BUNDLETOOL) build-bundle --modules=$< --output=$@
-base.zip: temp
+base.zip: base .FORCE
+	rm -f $@
 	@echo DEBUG:building $@
-	(cd temp && zip -r ../$@ .)
+	zip -r $@ $<
 	rm -rf $<
-temp: .FORCE
+base: .FORCE
 	@echo DEBUG:building $@
 	# the following don't work as prerequisites and I don't understand
 	# gmake well enough to fix it, so let's just `make` them.
@@ -144,9 +145,9 @@ temp: .FORCE
 	mkdir -p $@/manifest $@/dex
 	unzip -d $@ bin/$(APPNAME).unsigned.apk
 	mv $@/AndroidManifest.xml $@/manifest
-	cp bin/classes.dex $@/dex
+	cp bin/classes.dex $@/dex/
 	for directory in $$(find res/ -type d); do \
-	 (cd temp && mkdir -p $$directory); \
+	 (cd $@ && mkdir -p $$directory); \
 	done
 	for file in $$(find $@ -maxdepth 0 -type f); do \
 	 path=$$(find res/ -type f -name $$file); \

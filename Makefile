@@ -3,6 +3,7 @@ SHELL := /bin/bash
 # if building for immediate installation on phone, use `make NEW_PROCESS=`
 NEW_PROCESS ?= 1
 ADB_TIMEOUT ?= 3  # seconds to wait if no device connected
+REALLY ?= echo  # don't really run `make clean` or `make distclean`
 ADB_COPY ?= 5  # seconds to wait for audio file copy if no device connected
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.gnixl.$(APPNAME)
@@ -85,8 +86,20 @@ all: clean build reinstall copysingle $(AAB)
 %.debug:
 	@echo DEBUG:$*
 build: $(DIRS) $(R) $(APK)
-clean:
-	rm -rf $(R) $(DIRS)
+clean: .gitignore
+	$(REALLY) rm -rf dummy $$(sed -n '/^#clean/,/^#distclean/{//!p;}' $<)
+	@if [ "$(REALLY)" ]; then \
+	 echo NOTE: '`$(MAKE) REALLY= $(MAKECMDGOALS)`' \
+	  '(without the backticks) to bypass goofproofing' >&2; \
+	 false; \
+	fi
+distclean: .gitignore clean
+	$(REALLY) rm -rf dummy $$(sed -n '/^#distclean/,/^#end/{//!p;}' $<)
+	@if [ "$(REALLY)" ]; then \
+	 echo NOTE: '`$(MAKE) REALLY= $(MAKECMDGOALS)`' \
+	  '(without the backticks) to bypass goofproofing' >&2; \
+	 false; \
+	fi
 $(R): $(RESOURCES)
 	$(AAPT) package $(DEBUG) -f -m \
 	 --version-name $(VERSION) \
@@ -131,8 +144,8 @@ endif
 $(AAB): $(AAB:=.unsigned)
 	$(JARSIGNER) \
 	 -verbose \
-	 -sigalg SHA1withRSA \
-	 -digestalg SHA1 \
+	 -sigalg SHA256withRSA \
+	 -digestalg SHA256 \
 	 -keystore $(KEYSTORE) \
 	 -storepass $(APPNAME) \
 	 -keypass $(APPNAME) \
@@ -201,8 +214,8 @@ $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo DEBUG:building signed apk
 	$(JARSIGNER) \
 	 -verbose \
-	 -sigalg SHA1withRSA \
-	 -digestalg SHA1 \
+	 -sigalg SHA256withRSA \
+	 -digestalg SHA256 \
 	 -keystore $(KEYSTORE) \
 	 -storepass $(APPNAME) \
 	 -keypass $(APPNAME) \

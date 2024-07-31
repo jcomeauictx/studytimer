@@ -73,7 +73,7 @@ ifndef NEW_PROCESS
 all: rebuild reinstall copysingle
 else:
 # new build process creates uninstallable (at least on my phone) APK
-all: rebuild $(AAB)
+all: $(AAB)
 endif
 rebuild: clean build
 build: $(DIRS) $(R) $(APK)

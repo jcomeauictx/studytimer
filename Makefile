@@ -79,13 +79,13 @@ endif
 # new build process creates uninstallable (at least on my phone) APK
 # using conditionals for use of two different `all` recipes doesn't work
 # results are unpredictable
-all: clean build reinstall copysingle clean $(DIRS) $(AAB)
+all: clean build reinstall copysingle $(AAB)
 %.debug:
 	@echo DEBUG:$*
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
-src/$(APPPATH)/R.java: $(RESOURCES)
+$(R): $(RESOURCES)
 	$(AAPT) package $(DEBUG) -f -m \
 	 --version-name $(VERSION) \
 	 -J src \
@@ -133,11 +133,16 @@ base.zip: temp
 	@echo DEBUG:building $@
 	(cd temp && zip -r ../$@ .)
 	rm -rf $<
-temp: bin/$(APPNAME).unsigned.apk bin/classes.dex .FORCE
+temp: .FORCE
 	@echo DEBUG:building $@
+	# the following don't work as prerequisites and I don't understand
+	# gmake well enough to fix it, so let's just `make` them.
+	$(MAKE) clean
+	$(MAKE) $(DIRS) $(R) bin/$(APPNAME).unsigned.apk bin/classes.dex
+	# end of ugly hack
 	rm -rf $@
 	mkdir -p $@/manifest $@/dex
-	unzip -d $@ $<
+	unzip -d $@ bin/$(APPNAME).unsigned.apk
 	mv $@/AndroidManifest.xml $@/manifest
 	cp bin/classes.dex $@/dex
 	for directory in $$(find res/ -type d); do \

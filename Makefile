@@ -2,6 +2,8 @@ SHELL := /bin/bash
 # attempt to build using new process, has to be working by 2024-10-01
 # if building for immediate installation on phone, use `make NEW_PROCESS=`
 NEW_PROCESS ?= 1
+ADB_TIMEOUT ?= 3  # seconds to wait if no device connected
+ADB_COPY ?= 5  # seconds to wait for audio file copy if no device connected
 APPNAME := $(notdir $(PWD))
 PACKAGE := com.gnixl.$(APPNAME)
 APPPATH := $(subst .,/,$(PACKAGE))
@@ -193,9 +195,9 @@ $(APK): $(APK:.apk=.signed.apk)
 tools:
 	ls $(TOOLS)
 install:
-	-timeout 10 $(ADB) install $(APK)
+	-timeout $(ADB_TIMEOUT) $(ADB) install $(APK)
 uninstall:
-	-timeout 10 $(ADB) uninstall $(PACKAGE)
+	-timeout $(ADB_TIMEOUT) $(ADB) uninstall $(PACKAGE)
 reinstall: uninstall install
 test:
 	$(ADB) shell am start -n $(PACKAGE)/.MainActivity
@@ -228,7 +230,7 @@ fps: $(HOME)/appstore_upload_certificate.fp \
  $(HOME)/studytimer_privkey_new.fp $(HOME)/upload_cert.fp
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device
-	-timeout 10 $(ADB) shell mkdir -m 777 -p "$(STORAGE)" && \
+	-timeout $(ADB_COPY) $(ADB) shell mkdir -m 777 -p "$(STORAGE)" && \
 	  $(ADB) push "$(AUDIO)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)" \
 	   "$(STORAGE)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)"
 copyaudio:
@@ -300,5 +302,3 @@ $(HOME)/upload_cert.pem: $(UPLOAD_KEYSTORE)
 	 -keystore $(UPLOAD_KEYSTORE) \
 	 -alias upload \
 	 -file $@
-$(DIRS):
-	mkdir -p $@

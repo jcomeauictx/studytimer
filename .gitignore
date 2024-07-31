@@ -1,5 +1,9 @@
+# clean: generated files no longer needed after build
 src/com/gnixl/studytimer/R.java
 bin
 obj
 res/raw
-studytimer
+res_compiled
+base.zip
+# distclean: generated files that may be useful after build
+*.log

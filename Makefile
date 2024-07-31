@@ -132,7 +132,7 @@ $(AAB): base.zip
 base.zip: base .FORCE
 	rm -f $@
 	@echo DEBUG:building $@
-	zip -r $@ $<
+	cd $< && zip -r ../$@ .
 	rm -rf $<
 base: .FORCE
 	@echo DEBUG:building $@

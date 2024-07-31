@@ -15,7 +15,6 @@ DEBTOOLS := /usr/bin
 # https://developer.android.com/tools/bundletool
 # for building .aab files, Android App Bundles
 BUNDLETOOL_JAR := $(HOME)/Downloads/bundletool-all-1.17.1.jar
-BUNDLETOOL := $(JAVA) -jar $(BUNDLETOOL_JAR)
 AAPT ?= $(shell which $(DEBTOOLS)/aapt \
  $(TOOLS)/aapt \
  false 2>/dev/null | head -n 1)
@@ -33,6 +32,8 @@ JAVA ?= $(shell which java $(DEBTOOLS)/java \
  $(TOOLS)/java false 2>/dev/null | head -n 1)
 JAVAC ?= $(shell which javac $(DEBTOOLS)/javac \
  $(TOOLS)/javac false 2>/dev/null | head -n 1)
+# the following line MUST come after the JAVA definition above
+BUNDLETOOL := $(JAVA) -jar $(BUNDLETOOL_JAR)
 # MUST use java 7 with this version of Android tools!
 #PATH := /usr/lib/jvm/java-8-openjdk-amd64/bin:$(TOOLS):$(PATH)
 PATH := /usr/local/src/jdk1.7.0_80/bin:$(TOOLS):$(PATH)
@@ -68,12 +69,16 @@ STORAGE := $(SDCARD)/Android/data/$(PACKAGE)/files/$(SCHOOL)/$(YEAR)
 KEYSTORE ?= $(HOME)/$(APPNAME)key.keystore
 NEW_KEYSTORE ?= $(HOME)/$(APPNAME).keystore.p12
 UPLOAD_KEYSTORE ?= $(HOME)/google_upload.keystore
+ifneq ($(SHOWENV),)
 export
-ifndef NEW_PROCESS
-all: rebuild reinstall copysingle
-else:
+else
+# may need to export certain things for Makefile to work properly
+endif
+ifeq ($(NEW_PROCESS),1)
 # new build process creates uninstallable (at least on my phone) APK
 all: $(AAB)
+else:
+all: rebuild reinstall copysingle
 endif
 rebuild: clean build
 build: $(DIRS) $(R) $(APK)
@@ -101,7 +106,7 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
-ifndef NEW_PROCESS
+ifeq ($(NEW_PROCESS),1)
 bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	$(AAPT) package -f -m $(DEBUG) \
 	 --version-name $(VERSION) \
@@ -114,37 +119,47 @@ bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	rm $(<F)  # remove the copy
 else
 $(AAB): base.zip
+	@echo DEBUG:building $@
 	$(BUNDLETOOL) build-bundle --modules=$< --output=$@
 base.zip: temp
+	@echo DEBUG:building $@
 	(cd temp && zip -r ../$@ .)
+	rm -rf $<
 temp: bin/$(APPNAME).unsigned.apk bin/classes.dex .FORCE
+	@echo DEBUG:building $@
 	rm -rf $@
 	mkdir -p $@/manifest $@/dex
 	unzip -d $@ $<
 	mv $@/AndroidManifest.xml $@/manifest
 	cp bin/classes.dex $@/dex
-	for directory in $(shell find res/ -type d); do \
+	for directory in $$(find res/ -type d); do \
 	 (cd temp && mkdir -p $$directory); \
 	done
-	for file in $(shell find $@ -maxdepth 0 -type f); do \
-	 path=$(shell find res/ -type f -name $$file); \
+	for file in $$(find $@ -maxdepth 0 -type f); do \
+	 path=$$(find res/ -type f -name $$file); \
 	 if [ "$$path" ]; then \
 	  cp $$file $@/$(dir $$path)/; \
 	 fi; \
 	done
 bin/$(APPNAME).unsigned.apk: res_compiled
+	@echo DEBUG:building $@
 	$(AAPT2) link --proto-format -o $@ \
 	 -I $(ANDROID) \
 	 --manifest $(MANIFEST) \
 	 -R $</*.flat --auto-add-overlay
 res_compiled: res
+	@echo DEBUG:building $@
 	mkdir -p $@
 	$(AAPT2) compile $(shell find $</ -type f) -o $@/
 endif
 edit: $(EDITABLE)
 	vi $+
 env:
+ifneq ($(SHOWENV),)
 	env | grep -v '^LS_COLORS'
+else
+	$(MAKE) SHOWENV=1 $@
+endif
 version:
 	$(JAVA) -version
 	$(JAVAC) -version
@@ -162,13 +177,14 @@ $(KEYSTORE):
 	 -keysize 2048
 $(AAB): $(wildcard res_compiled/*.flat)
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
+	@echo DEBUG:building signed apk
 	@echo Enter password as: $(APPNAME)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
 	 -keystore $(KEYSTORE) \
-	 $< $(APPNAME)
+	 $< $(APPNAME)  # final $(APPNAME) is for alias
 	mv $< $@
 $(APK): $(APK:.apk=.signed.apk)
 	rm -f $@

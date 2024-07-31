@@ -30,10 +30,12 @@ DX ?= $(shell which $(DEBTOOLS)/dx $(TOOLS)/dx false 2>/dev/null | head -n 1)
 ZIPALIGN ?= $(shell which $(DEBTOOLS)/zipalign \
  $(TOOLS)/zipalign \
  false 2>/dev/null | head -n 1)
-JAVA ?= $(shell which java $(DEBTOOLS)/java \
- $(TOOLS)/java false 2>/dev/null | head -n 1)
-JAVAC ?= $(shell which javac $(DEBTOOLS)/javac \
- $(TOOLS)/javac false 2>/dev/null | head -n 1)
+JAVA ?= $(shell which $(DEBTOOLS)/java \
+ $(TOOLS)/java java false 2>/dev/null | head -n 1)
+JAVAC ?= $(shell which $(DEBTOOLS)/javac \
+ $(TOOLS)/javac javac false 2>/dev/null | head -n 1)
+JARSIGNER ?= $(shell which $(DEBTOOLS)/jarsigner \
+ $(TOOLS)/jarsigner jarsigner false 2>/dev/null | head -n 1)
 # the following line MUST come after the JAVA definition above
 BUNDLETOOL := $(JAVA) -jar $(BUNDLETOOL_JAR)
 # MUST use java 7 with this version of Android tools!
@@ -126,9 +128,21 @@ else
 	 --manifest $(MANIFEST) \
 	 -R $(word 2, $+)/*.flat --auto-add-overlay
 endif
-$(AAB): base.zip
+$(AAB): $(AAB:=.unsigned)
+	$(JARSIGNER) \
+	 -verbose \
+	 -sigalg SHA1withRSA \
+	 -digestalg SHA1 \
+	 -keystore $(KEYSTORE) \
+	 -storepass $(APPNAME) \
+	 -keypass $(APPNAME) \
+	 $< $(APPNAME)  # final $(APPNAME) is for alias
+	mv $< $@
+$(AAB:=.unsigned): base.zip
 	@echo DEBUG:building $@
 	$(BUNDLETOOL) build-bundle --modules=$< --output=$@
+	$(BUNDLETOOL) validate --bundle $@
+	cp -i $@ $(USBKEY)
 base.zip: base .FORCE
 	rm -f $@
 	@echo DEBUG:building $@
@@ -185,7 +199,7 @@ $(KEYSTORE):
 $(AAB): $(wildcard res_compiled/*.flat)
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo DEBUG:building signed apk
-	jarsigner \
+	$(JARSIGNER) \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
@@ -197,7 +211,7 @@ $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 $(APK): $(APK:.apk=.signed.apk)
 	rm -f $@
 	$(ZIPALIGN) -f 4 $< $@
-	cp -i $@ ~/Downloads/
+	cp -i $@ $(USBKEY)
 tools:
 	ls $(TOOLS)
 install:

@@ -74,13 +74,12 @@ export
 else
 # may need to export certain things for Makefile to work properly
 endif
-ifeq ($(NEW_PROCESS),1)
 # new build process creates uninstallable (at least on my phone) APK
-all: $(AAB)
-else:
-all: rebuild reinstall copysingle
-endif
-rebuild: clean build
+# using conditionals for use of two different `all` recipes doesn't work
+# results are unpredictable
+all: clean build reinstall copysingle clean $(DIRS) $(AAB)
+%.debug:
+	@echo DEBUG:$*
 build: $(DIRS) $(R) $(APK)
 clean:
 	rm -rf $(R) $(DIRS)
@@ -106,8 +105,9 @@ bin/classes.dex: $(CLASSES)
 	 --dex \
 	 --output=$@ \
 	 obj
-ifeq ($(NEW_PROCESS),1)
-bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
+bin/$(APPNAME).unsigned.apk: bin/classes.dex res_compiled $(MANIFEST)
+ifeq ($(NEW_PROCESS),)
+	@echo DEBUG:building $@ for immediate deployment
 	$(AAPT) package -f -m $(DEBUG) \
 	 --version-name $(VERSION) \
 	 -F $@ \
@@ -118,6 +118,12 @@ bin/$(APPNAME).unsigned.apk: bin/classes.dex $(MANIFEST)
 	$(AAPT) add $@ classes.dex
 	rm $(<F)  # remove the copy
 else
+	@echo DEBUG:building $@ for Android App Bundle
+	$(AAPT2) link --proto-format -o $@ \
+	 -I $(ANDROID) \
+	 --manifest $(MANIFEST) \
+	 -R $(word 2, $+)/*.flat --auto-add-overlay
+endif
 $(AAB): base.zip
 	@echo DEBUG:building $@
 	$(BUNDLETOOL) build-bundle --modules=$< --output=$@
@@ -141,17 +147,10 @@ temp: bin/$(APPNAME).unsigned.apk bin/classes.dex .FORCE
 	  cp $$file $@/$(dir $$path)/; \
 	 fi; \
 	done
-bin/$(APPNAME).unsigned.apk: res_compiled
-	@echo DEBUG:building $@
-	$(AAPT2) link --proto-format -o $@ \
-	 -I $(ANDROID) \
-	 --manifest $(MANIFEST) \
-	 -R $</*.flat --auto-add-overlay
 res_compiled: res
 	@echo DEBUG:building $@
 	mkdir -p $@
 	$(AAPT2) compile $(shell find $</ -type f) -o $@/
-endif
 edit: $(EDITABLE)
 	vi $+
 env:
@@ -178,12 +177,13 @@ $(KEYSTORE):
 $(AAB): $(wildcard res_compiled/*.flat)
 $(APK:.apk=.signed.apk): $(APK:.apk=.unsigned.apk)
 	@echo DEBUG:building signed apk
-	@echo Enter password as: $(APPNAME)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
 	 -keystore $(KEYSTORE) \
+	 -storepass $(APPNAME) \
+	 -keypass $(APPNAME) \
 	 $< $(APPNAME)  # final $(APPNAME) is for alias
 	mv $< $@
 $(APK): $(APK:.apk=.signed.apk)
@@ -193,9 +193,9 @@ $(APK): $(APK:.apk=.signed.apk)
 tools:
 	ls $(TOOLS)
 install:
-	$(ADB) install $(APK)
+	-timeout 10 $(ADB) install $(APK)
 uninstall:
-	-$(ADB) uninstall $(PACKAGE)
+	-timeout 10 $(ADB) uninstall $(PACKAGE)
 reinstall: uninstall install
 test:
 	$(ADB) shell am start -n $(PACKAGE)/.MainActivity
@@ -228,9 +228,9 @@ fps: $(HOME)/appstore_upload_certificate.fp \
  $(HOME)/studytimer_privkey_new.fp $(HOME)/upload_cert.fp
 copysingle:
 	@echo Copying "$(AUDIO)/$(FIRSTAUDIO)/$(SINGLEAUDIO)" to device
-	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"
-	$(ADB) push "$(AUDIO)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)" \
-		"$(STORAGE)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)"
+	-timeout 10 $(ADB) shell mkdir -m 777 -p "$(STORAGE)" && \
+	  $(ADB) push "$(AUDIO)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)" \
+	   "$(STORAGE)"/"$(FIRSTAUDIO)"/"$(SINGLEAUDIO)"
 copyaudio:
 	@echo Copying mp3 files from "$(AUDIO)/$(FIRSTAUDIO)" to device
 	$(ADB) shell mkdir -m 777 -p "$(STORAGE)"
@@ -300,3 +300,5 @@ $(HOME)/upload_cert.pem: $(UPLOAD_KEYSTORE)
 	 -keystore $(UPLOAD_KEYSTORE) \
 	 -alias upload \
 	 -file $@
+$(DIRS):
+	mkdir -p $@
